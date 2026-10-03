@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>兴芝林 XINGZHILIN · 专业厨房剪刀制造商</title>
+<meta name="description" content="兴芝林刀剪厂——十三年专注厨房剪刀制造，远销东南亚、印度、迪拜。匠心之作，不妥协。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<style>
+/* ============ RESET & TOKENS ============ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --color-bg: #ffffff;
+  --color-primary-text: #000000;
+  --color-demoted-text: #000000;
+  --color-divider: #000000;
+  --color-accent: #A3111E;
+  --font-stack: 'Inter Tight', 'Noto Sans SC', 'Inter', Arial, sans-serif;
+  --font-display: 'Instrument Serif', 'Noto Serif SC', Georgia, serif;
+}
+html { scroll-behavior: auto; }
+html, body { background: var(--color-bg); }
+body {
+  font-family: var(--font-stack);
+  color: var(--color-primary-text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img, video { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; background: none; border: none; cursor: pointer; color: inherit; }
+
+/* ============ FIXED HEADER ============ */
+.site-header {
+  position: fixed; top: 32px; left: 32px; right: 32px; height: 30px; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo img { height: 34px; width: auto; display: block; }
+.header-nav { display: flex; align-items: center; }
+.header-nav .about-link {
+  font-size: 15px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--color-accent);
+  margin-right: 194px; transition: opacity 0.25s ease;
+}
+.lang-toggle {
+  font-size: 15px; font-weight: 500; color: var(--color-accent);
+  margin-right: 40px; letter-spacing: 0.04em; transition: opacity 0.25s ease;
+  display: flex; align-items: center; gap: 6px;
+}
+.lang-toggle .lang-sep { opacity: 0.4; }
+.lang-toggle .lang-opt { opacity: 0.45; }
+.lang-toggle .lang-opt.active { opacity: 1; }
+.cart-menu-group { display: flex; align-items: center; gap: 50px; }
+.hamburger { display: flex; flex-direction: column; gap: 5px; padding: 6px 0; transition: opacity 0.25s ease; }
+.hamburger span { display: block; width: 30px; height: 2.2px; background: var(--color-accent); }
+.bag-btn {
+  font-size: 15px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--color-accent); transition: opacity 0.25s ease;
+}
+.about-link:hover, .bag-btn:hover, .hamburger:hover, .lang-toggle:hover { opacity: 0.7; }
+
+/* Fullscreen menu overlay */
+.menu-overlay {
+  position: fixed; inset: 0; z-index: 200; background: #ffffff;
+  display: flex; flex-direction: column; justify-content: center; padding: 48px;
+  opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s;
+}
+.menu-overlay.open { opacity: 1; visibility: visible; }
+.menu-overlay nav { display: flex; flex-direction: column; gap: 8px; }
+.menu-overlay nav a {
+  font-family: var(--font-display); font-size: clamp(40px, 7vw, 84px);
+  line-height: 1.1; color: #000; transition: color 0.25s ease, transform 0.35s ease;
+}
+.menu-overlay nav a:hover { color: var(--color-accent); transform: translateX(12px); }
+.menu-close {
+  position: absolute; top: 32px; right: 32px; font-size: 15px; font-weight: 500;
+  color: var(--color-accent); letter-spacing: 0.04em;
+}
+
+/* ============ PAGE SCAFFOLD (footer reveal) ============ */
+.page-content { position: relative; z-index: 10; background: #ffffff; }
+.footer-spacer { background: transparent; pointer-events: none; }
+
+/* ============ HERO (scroll-driven video) ============ */
+.hero-section { height: 500vh; background: #000000; position: relative; z-index: 10; }
+.hero-sticky {
+  position: sticky; top: 0; height: 100vh; background: #000000;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 48px; overflow: hidden;
+}
+.hero-video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 1;
+}
+.video-overlay { display: none; }
+.hero-content { position: relative; z-index: 3; max-width: 700px; }
+.hero-title {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(36px, 6vw, 72px); line-height: 1.05; letter-spacing: -1px;
+  color: #ffffff;
+}
+.hero-title-line { display: block; overflow: hidden; }
+.hero-title-line-inner { display: inline-block; }
+.hero-char { display: inline-block; will-change: opacity, transform, filter; }
+.hero-cta { margin-top: 10px; }
+.btn-capsule {
+  display: inline-flex; align-items: center; gap: 14px;
+  background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 100px;
+  padding: 4px 4px 4px 18px; min-height: 38px;
+  font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
+  color: #000; transition: background 0.3s ease, color 0.3s ease;
+}
+.btn-capsule .btn-circle {
+  position: relative; width: 28px; height: 28px; border-radius: 50%;
+  background: #2e2e2e; flex-shrink: 0; transition: background 0.3s ease;
+}
+.btn-capsule .btn-circle::before,
+.btn-capsule .btn-circle::after {
+  content: ''; position: absolute; top: 50%; left: 50%; background: #ffffff;
+  transform: translate(-50%, -50%); transition: background 0.3s ease;
+}
+.btn-capsule .btn-circle::before { width: 10px; height: 1.5px; }
+.btn-capsule .btn-circle::after { width: 1.5px; height: 10px; }
+.btn-capsule:hover { background: #000000; color: #ffffff; }
+.btn-capsule:hover .btn-circle { background: #ffffff; }
+.btn-capsule:hover .btn-circle::before,
+.btn-capsule:hover .btn-circle::after { background: #000000; }
+.hero-scroll-hint {
+  position: absolute; right: 48px; bottom: 48px; z-index: 3;
+  color: rgba(255,255,255,0.55); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-scroll-hint::after {
+  content: ''; width: 1px; height: 44px; background: rgba(255,255,255,0.55);
+  animation: hintDrop 1.8s ease-in-out infinite;
+}
+@keyframes hintDrop { 0% { transform: scaleY(0); transform-origin: top; } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+/* ============ HERO HELIX FLOW (blueprint) ============ */
+.hero-sticky { background: #060a14; }
+.helix-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }
+.blueprint-grid {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 44%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 44%, #000 25%, transparent 78%);
+}
+.blueprint-stage {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 1400px; pointer-events: none;
+}
+.blueprint-tilt {
+  position: relative; transform-style: preserve-3d; will-change: transform;
+}
+.blueprint-helix { will-change: transform; --spiral: 0; }
+.blueprint-img {
+  max-width: min(88vw, 1150px); max-height: 54vh; width: auto; height: auto;
+  filter: drop-shadow(0 0 26px rgba(163, 17, 30, 0.28)) drop-shadow(0 0 70px rgba(255,255,255,0.07));
+  -webkit-mask-image: conic-gradient(from 0deg, #000 calc(var(--spiral) * 1deg), transparent calc(var(--spiral) * 1deg));
+  mask-image: conic-gradient(from 0deg, #000 calc(var(--spiral) * 1deg), transparent calc(var(--spiral) * 1deg));
+}
+.anno {
+  position: absolute; display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.9); white-space: nowrap;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.anno i {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: var(--color-accent); box-shadow: 0 0 14px var(--color-accent);
+}
+.anno b { font-weight: 500; }
+.anno.on { opacity: 1; transform: translateY(0); }
+.anno[data-anno="0"] { top: 30%; left: 8%; }
+.anno[data-anno="1"] { top: 20%; left: 62%; }
+.anno[data-anno="2"] { top: 74%; left: 66%; }
+
+/* ============ PRODUCT CAROUSEL ============ */
+.awards-section {
+  height: 100vh; overflow: hidden; position: relative; z-index: 10;
+  background: #ffffff; border-top: 1px solid #000; border-bottom: 1px solid #000;
+}
+.awards-grid {
+  display: flex; flex-direction: row; width: max-content; height: 100%;
+  will-change: transform;
+}
+.product-card {
+  width: 33.333vw; height: 100%; flex-shrink: 0;
+  border-right: 1px solid #000; background: #ffffff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(40px, 8vh, 80px) 48px; gap: clamp(24px, 4vh, 48px);
+  text-align: center;
+}
+.product-card:last-child { border-right: none; }
+.product-img-wrap { height: 280px; display: flex; align-items: center; justify-content: center; max-width: 85%; }
+.product-img-wrap img { max-height: 100%; max-width: 100%; object-fit: contain; }
+.product-name { font-size: 18px; font-weight: 400; letter-spacing: -0.2px; }
+.product-name .en-sub { display: block; font-size: 13px; opacity: 0.55; margin-top: 6px; letter-spacing: 0.02em; }
+.product-price { font-size: 16px; font-weight: 500; opacity: 0.6; }
+.video-scaling-wrapper {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 0%; height: 100%; overflow: hidden; z-index: 5;
+  will-change: width; pointer-events: none;
+}
+.video-scaling-wrapper.active { pointer-events: auto; }
+.reveal-video {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 100vw; height: 100vh; object-fit: cover;
+}
+.reveal-caption {
+  position: absolute; left: 48px; bottom: 48px; z-index: 6;
+  color: #fff; font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 54px); line-height: 1.1; letter-spacing: -0.5px;
+  opacity: 0; transition: opacity 0.6s ease; max-width: 640px;
+}
+.video-scaling-wrapper.active .reveal-caption { opacity: 1; }
+
+/* ============ STATS (two-column) ============ */
+.stats-section {
+  display: grid; grid-template-columns: 50% 50%;
+  border-bottom: 1px solid #000; background: #ffffff; position: relative; z-index: 10;
+}
+.stats-left {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 48px 96px 48px 48px;
+}
+.stats-heading {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(32px, 4vw, 42px); line-height: 1.15; letter-spacing: -0.5px;
+}
+.stats-copy { display: flex; flex-direction: column; gap: 32px; }
+.stats-copy p { font-size: 24px; font-weight: 400; line-height: 1.35; letter-spacing: -0.2px; }
+.stats-left .btn-capsule { align-self: flex-start; margin-top: 8px; }
+.stats-right { border-left: 1px solid #000; }
+.stat-card { padding: 48px; min-height: 45vh; border-bottom: 1px solid #000; display: flex; flex-direction: column; justify-content: center; }
+.stat-card:last-child { border-bottom: none; }
+.stomp-stack:first-child { display: none; }
+.heading-style-h1 {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(46px, 5.5vw, 70px); letter-spacing: -1.5px; line-height: 0.95;
+}
+.stat-char { display: inline-block; will-change: opacity, transform; }
+.detail-paragraph { font-size: 24px; padding-top: 42px; line-height: 1.35; max-width: 560px; }
+.detail-word { display: inline-block; }
+.card-subtext { font-size: 13px; margin-top: 12px; opacity: 0.6; letter-spacing: 0.04em; }
+
+/* ============ NEWS ============ */
+.news-section { background: #ffffff; border-bottom: 1px solid #000; padding: 96px 48px; position: relative; z-index: 10; }
+.news-heading {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.5px; margin-bottom: 48px;
+}
+.news-list { border-top: 1px solid #000; }
+.news-item {
+  display: grid; grid-template-columns: 140px 1fr auto; gap: 32px; align-items: baseline;
+  padding: 32px 0; border-bottom: 1px solid #000; transition: background 0.25s ease;
+}
+.news-item:hover { background: #fafafa; }
+.news-date { font-size: 14px; font-weight: 500; letter-spacing: 0.06em; opacity: 0.6; }
+.news-title { font-size: 22px; font-weight: 500; letter-spacing: -0.2px; }
+.news-excerpt { grid-column: 2; font-size: 15px; line-height: 1.6; opacity: 0.7; max-width: 720px; margin-top: 8px; }
+.news-arrow { font-size: 22px; transition: transform 0.3s ease; }
+.news-item:hover .news-arrow { transform: translateX(8px); color: var(--color-accent); }
+
+/* ============ FOOTER (fixed reveal) ============ */
+.site-footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1;
+  background: #ffffff; display: grid; grid-template-columns: 1.2fr 1fr 1.5fr;
+  gap: 48px; padding: 80px 48px;
+}
+.footer-col h3, .footer-col .footer-link-head {
+  font-size: 18px; font-weight: 400; letter-spacing: -0.2px; margin-bottom: 24px; display: block;
+}
+.footer-col a { transition: opacity 0.25s ease; }
+.footer-col a:hover { opacity: 0.6; }
+.footer-credits { font-size: 18px; line-height: 1.35; }
+.footer-credits .blank-line { height: 1.35em; }
+.footer-links { display: flex; flex-direction: column; gap: 12px; font-size: 18px; font-weight: 400; }
+.footer-contact { margin-top: 24px; font-size: 15px; line-height: 1.7; opacity: 0.85; }
+.footer-contact strong { font-weight: 500; }
+.newsletter-desc { font-size: 18px; line-height: 1.35; max-width: 380px; margin-bottom: 24px; }
+.newsletter-form {
+  display: flex; align-items: center; background: #f7f7f5; border-radius: 100px;
+  padding: 6px 6px 6px 24px; max-width: 440px; transition: box-shadow 0.25s ease;
+}
+.newsletter-form:focus-within { box-shadow: 0 0 0 1px #000000; }
+.newsletter-form input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: inherit; font-size: 14px; color: #000; min-width: 0;
+}
+.newsletter-form input::placeholder { color: rgba(0,0,0,0.45); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1199px) and (min-width: 769px) {
+  .site-header { top: 24px; left: 24px; right: 24px; }
+  .header-nav .about-link { margin-right: 100px; }
+  .cart-menu-group { gap: 32px; }
+  .stats-left { padding: 40px 32px; }
+  .hero-title { font-size: 48px; }
+  .heading-style-h1 { font-size: 44px !important; }
+  .stats-heading { font-size: 30px; }
+  .stats-copy p, .detail-paragraph { font-size: 18px; }
+  .product-card { width: 50vw; }
+  .site-footer { grid-template-columns: 1fr 1fr; }
+  .site-footer .footer-col:last-child { grid-column: span 2; }
+}
+@media (max-width: 768px) {
+  .site-header { top: 16px; left: 16px; right: 16px; }
+  .header-nav .about-link { margin-right: 24px; font-size: 13px; }
+  .lang-toggle { margin-right: 20px; font-size: 13px; }
+  .cart-menu-group { gap: 20px; }
+  .bag-btn { font-size: 13px; }
+  .hamburger span { width: 26px; }
+  .header-logo img { height: 28px; }
+  .hero-sticky { padding: 24px 16px; }
+  .hero-title { font-size: 38px; }
+  .hero-scroll-hint { display: none; }
+  .stats-section { grid-template-columns: 1fr; }
+  .stats-left { position: static; height: auto; padding: 64px 24px; gap: 40px; }
+  .stats-right { border-left: none; border-top: 1px solid #000; }
+  .stats-copy p { font-size: 15px; }
+  .heading-style-h1 { font-size: 34px !important; }
+  .detail-paragraph { font-size: 15px; padding-top: 24px; }
+  .stat-card { padding: 40px 24px; min-height: 0; }
+  .product-card { width: 85vw; padding: 40px 24px; }
+  .product-img-wrap { height: 220px; }
+  .news-section { padding: 64px 24px; }
+  .news-item { grid-template-columns: 1fr auto; gap: 12px; }
+  .news-date { grid-column: 1; }
+  .news-excerpt { grid-column: 1; }
+  .site-footer { grid-template-columns: 1fr; padding: 48px 16px; gap: 40px; }
+  .btn-capsule { min-height: 44px; }
+  .newsletter-form { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= FIXED HEADER ================= -->
+<header class="site-header">
+  <a class="header-logo" href="#" aria-label="兴芝林 XINGZHILIN">
+    <img src="/images/logo-header.png" alt="兴芝林 XINGZHILIN" />
+  </a>
+  <nav class="header-nav">
+    <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language">
+      <span class="lang-opt" data-lang="zh">中</span><span class="lang-sep">/</span><span class="lang-opt" data-lang="en">EN</span>
+    </button>
+    <a class="about-link" href="#about" data-i18n="nav_about">关于我们</a>
+    <div class="cart-menu-group">
+      <button class="hamburger" id="menuBtn" aria-label="菜单">
+        <span></span><span></span>
+      </button>
+      <button class="bag-btn" id="bagBtn" data-i18n="nav_bag">[ 购物袋 ]</button>
+    </div>
+  </nav>
+</header>
+
+<!-- Fullscreen menu -->
+<div class="menu-overlay" id="menuOverlay">
+  <button class="menu-close" id="menuClose" data-i18n="menu_close">关闭 ×</button>
+  <nav>
+    <a href="#products" data-i18n="menu_products">产品系列</a>
+    <a href="#about" data-i18n="menu_about">关于兴芝林</a>
+    <a href="#news" data-i18n="menu_news">新闻动态</a>
+    <a href="#contact" data-i18n="menu_contact">联系我们</a>
+  </nav>
+</div>
+
+<main class="page-content">
+
+  <!-- ================= HERO : scroll-driven helix flow ================= -->
+  <section class="hero-section" id="hero">
+    <div class="hero-sticky" id="heroSticky">
+      <canvas class="helix-canvas" id="helixCanvas"></canvas>
+      <div class="blueprint-grid"></div>
+      <div class="blueprint-stage">
+        <div class="blueprint-tilt" id="blueprintTilt">
+          <div class="blueprint-helix" id="blueprintHelix">
+            <img class="blueprint-img" src="/images/blueprint.webp" alt="兴芝林设计手稿" />
+          </div>
+          <span class="anno" data-anno="0"><i></i><b data-i18n="anno1">手工研磨刃口</b></span>
+          <span class="anno" data-anno="1"><i></i><b>230 mm</b></span>
+          <span class="anno" data-anno="2"><i></i><b data-i18n="anno2">兴芝林设计手稿</b></span>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title" aria-label="精工利刃">
+          <span class="hero-title-line"><span class="hero-title-line-inner" data-title-line="0">精工</span></span>
+          <span class="hero-title-line"><span class="hero-title-line-inner" data-title-line="1">利刃</span></span>
+        </h1>
+        <div class="hero-cta">
+          <button class="btn-capsule" id="discoverBtn">
+            <span data-i18n="hero_discover">探索</span><span class="btn-circle"></span>
+          </button>
+        </div>
+      </div>
+      <div class="hero-scroll-hint" data-i18n="hero_scroll">向下滚动</div>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCT CAROUSEL ================= -->
+  <section class="awards-section" id="products">
+    <div class="awards-grid" id="awardsGrid">
+      <div class="product-card">
+        <div class="product-img-wrap"><img src="/images/product-1.webp" alt="曜石烤肉剪" loading="lazy" /></div>
+        <div><div class="product-name"><span data-i18n="p1_name">曜石烤肉剪</span><span class="en-sub">Obsidian BBQ Shears</span></div></div>
+        <div class="product-price">¥168</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><img src="/images/product-2.webp" alt="臻黑烤肉剪" loading="lazy" /></div>
+        <div><div class="product-name"><span data-i18n="p2_name">臻黑烤肉剪</span><span class="en-sub">Onyx BBQ Shears</span></div></div>
+        <div class="product-price">¥158</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><img src="/images/product-3.webp" alt="磁吸冰箱剪" loading="lazy" /></div>
+        <div><div class="product-name"><span data-i18n="p3_name">磁吸冰箱剪</span><span class="en-sub">Magnetic Fridge Scissors</span></div></div>
+        <div class="product-price">¥98</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><img src="/images/product-4.webp" alt="青竹家用剪" loading="lazy" /></div>
+        <div><div class="product-name"><span data-i18n="p4_name">青竹家用剪</span><span class="en-sub">Bamboo Green Household Shears</span></div></div>
+        <div class="product-price">¥88</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><img src="/images/product-5.webp" alt="墨灰磁吸剪" loading="lazy" /></div>
+        <div><div class="product-name"><span data-i18n="p5_name">墨灰磁吸剪</span><span class="en-sub">Graphite Magnetic Scissors</span></div></div>
+        <div class="product-price">¥108</div>
+      </div>
+    </div>
+    <div class="video-scaling-wrapper" id="videoScalingWrapper">
+      <video class="reveal-video" id="revealVideo" muted playsinline preload="auto"
+             poster="/images/product-5.webp" disablepictureinpicture>
+      </video>
+      <div class="reveal-caption" data-i18n="reveal_caption">一剪一世界，锋利即态度。</div>
+    </div>
+  </section>
+
+  <!-- ================= STATS ================= -->
+  <section class="stats-section" id="about">
+    <div class="stats-left">
+      <div>
+        <h2 class="stats-heading" data-fade-slide-in data-i18n="stats_heading">匠心之作，不妥协</h2>
+      </div>
+      <div class="stats-copy">
+        <p data-fade-slide-in data-i18n="stats_p1">每一把剪刀都由一双手完成——没有冰冷的流水线，没有敷衍的组装。先选材，再成型，顺应钢材的本性。</p>
+        <p data-fade-slide-in data-i18n="stats_p2">我们选用优质不锈钢，刀刃手工开锋、反复研磨。重量趁手，刃口锋利，每一处细节都不将就。</p>
+        <p data-fade-slide-in data-i18n="stats_p3">兴芝林为懂剪刀的人而存在。不止是工具，更是信赖。一把一剪，经久耐用。</p>
+        <button class="btn-capsule" id="viewCollectionBtn" data-fade-slide-in>
+          <span data-i18n="stats_cta">查看产品</span><span class="btn-circle"></span>
+        </button>
+      </div>
+    </div>
+    <div class="stats-right">
+      <div class="stat-card">
+        <div class="stomp-wrapper">
+          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">13年</h1></div>
+          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="0">13年</h1></div>
+        </div>
+        <p class="detail-paragraph" data-detail="0" data-i18n="stat_d1">十三年专注刀剪制造</p>
+      </div>
+      <div class="stat-card">
+        <div class="stomp-wrapper">
+          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">50+</h1></div>
+          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="1">50+ 工匠</h1></div>
+        </div>
+        <p class="detail-paragraph" data-detail="1" data-i18n="stat_d2">五十余名熟练工匠，每一把剪刀都经过手工精磨</p>
+      </div>
+      <div class="stat-card">
+        <div class="stomp-wrapper">
+          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">20+</h1></div>
+          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="2">20+ 市场</h1></div>
+        </div>
+        <p class="detail-paragraph" data-detail="2" data-i18n="stat_d3">远销东南亚、印度、迪拜等二十余个国家和地区</p>
+      </div>
+      <div class="stat-card">
+        <div class="stomp-wrapper">
+          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">100%</h1></div>
+          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="3">100% 手工精修</h1></div>
+        </div>
+        <p class="detail-paragraph" data-detail="3" data-i18n="stat_d4">出厂全检，品质承诺，售后无忧</p>
+        <p class="card-subtext" data-i18n="stat_sub">兴芝林刀剪厂，始于 2013 年。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NEWS ================= -->
+  <section class="news-section" id="news">
+    <h2 class="news-heading" data-fade-slide-in data-i18n="news_heading">新闻动态</h2>
+    <div class="news-list">
+      <a class="news-item" href="#news" data-fade-slide-in>
+        <span class="news-date">2026.09.18</span>
+        <span class="news-title" data-i18n="news1_title">亮相广交会，厨房剪系列备受海外客商青睐</span>
+        <span class="news-arrow">→</span>
+        <span class="news-excerpt" data-i18n="news1_excerpt">第 140 届广交会上，兴芝林多款厨房剪刀吸引了来自东南亚、中东的数十家采购商驻足洽谈，现场达成多项合作意向。</span>
+      </a>
+      <a class="news-item" href="#news" data-fade-slide-in>
+        <span class="news-date">2026.07.02</span>
+        <span class="news-title" data-i18n="news2_title">新品「鸡骨剪」上市，斩骨如泥好评如潮</span>
+        <span class="news-arrow">→</span>
+        <span class="news-excerpt" data-i18n="news2_excerpt">加厚锯齿刃口、省力弹簧设计，全新鸡骨剪一经推出便受到餐饮客户与家庭用户的一致好评。</span>
+      </a>
+      <a class="news-item" href="#news" data-fade-slide-in>
+        <span class="news-date">2026.04.11</span>
+        <span class="news-title" data-i18n="news3_title">牵手迪拜经销商，深耕中东市场</span>
+        <span class="news-arrow">→</span>
+        <span class="news-excerpt" data-i18n="news3_excerpt">兴芝林与迪拜头部厨具经销商签署战略合作协议，未来三年将共同开拓中东及北非市场。</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="footer-spacer" id="footerSpacer"></div>
+</main>
+
+<!-- ================= FOOTER (fixed reveal) ================= -->
+<footer class="site-footer" id="siteFooter">
+  <div class="footer-col">
+    <a class="footer-link-head" href="#contact" data-i18n="footer_signin">经销商登录</a>
+    <div class="footer-credits">
+      <span data-i18n="footer_c1">小批量匠心制造</span><br />
+      <span data-i18n="footer_c2">兴芝林刀剪厂</span>
+      <div class="blank-line"></div>
+      <span data-i18n="footer_c3">位于中国阳江</span><br />
+      <span data-i18n="footer_c4">(c) 兴芝林 2026</span><br />
+      <span data-i18n="footer_c5">所有产品均为原创设计。</span>
+    </div>
+    <div class="footer-contact" id="contact">
+      <strong data-i18n="contact_addr_label">地址：</strong><span data-i18n="contact_addr">广东省阳江市阳东区红丰镇兴芝林刀剪厂</span><br />
+      <strong data-i18n="contact_tel_label">电话：</strong><a href="tel:16666847888">16666847888</a>
+    </div>
+  </div>
+  <div class="footer-col">
+    <a class="footer-link-head" href="#contact" data-i18n="footer_follow">关注我们</a>
+    <div class="footer-links">
+      <a href="#" data-i18n="footer_l1">退款政策</a>
+      <a href="#" data-i18n="footer_l2">隐私政策</a>
+      <a href="#" data-i18n="footer_l3">服务条款</a>
+    </div>
+  </div>
+  <div class="footer-col">
+    <h3 data-i18n="footer_nl">订阅资讯</h3>
+    <p class="newsletter-desc" data-i18n="footer_nl_desc">加入我们的邮件列表，第一时间获取新品动态，首单享 9 折。</p>
+    <form class="newsletter-form" id="newsletterForm">
+      <input type="email" id="newsletterEmail" data-i18n-ph="footer_nl_ph" placeholder="邮箱地址" required />
+      <button class="btn-capsule" type="submit">
+        <span data-i18n="footer_nl_btn">订阅</span><span class="btn-circle"></span>
+      </button>
+    </form>
+  </div>
+</footer>
+<script>
+/* ================================================================
+   XINGZHILIN · 兴芝林 — single-page app logic
+   GSAP 3.12.5 + ScrollTrigger · scroll-driven video scrubbing
+   ================================================================ */
+gsap.registerPlugin(ScrollTrigger);
+
+/* ---------------- I18N ---------------- */
+const I18N = {
+  zh: {
+    nav_about: '关于我们', nav_bag: '[ 购物袋 ]',
+    menu_close: '关闭 ×', menu_products: '产品系列', menu_about: '关于兴芝林', menu_news: '新闻动态', menu_contact: '联系我们',
+    hero_t1: '精工', hero_t2: '利刃', hero_discover: '探索', hero_scroll: '向下滚动',
+    anno1: '手工研磨刃口', anno2: '兴芝林设计手稿',
+    p1_name: '曜石烤肉剪', p2_name: '臻黑烤肉剪', p3_name: '磁吸冰箱剪',
+    p4_name: '青竹家用剪', p5_name: '墨灰磁吸剪',
+    reveal_caption: '一剪一世界，锋利即态度。',
+    stats_heading: '匠心之作，不妥协',
+    stats_p1: '每一把剪刀都由一双手完成——没有冰冷的流水线，没有敷衍的组装。先选材，再成型，顺应钢材的本性。',
+    stats_p2: '我们选用优质不锈钢，刀刃手工开锋、反复研磨。重量趁手，刃口锋利，每一处细节都不将就。',
+    stats_p3: '兴芝林为懂剪刀的人而存在。不止是工具，更是信赖。一把一剪，经久耐用。',
+    stats_cta: '查看产品',
+    stat_h0: '13年', stat_h1: '50+ 工匠', stat_h2: '20+ 市场', stat_h3: '100% 手工精修',
+    stat_d0: '十三年专注刀剪制造', stat_d1: '五十余名熟练工匠，每一把剪刀都经过手工精磨',
+    stat_d2: '远销东南亚、印度、迪拜等二十余个国家和地区', stat_d3: '出厂全检，品质承诺，售后无忧',
+    stat_sub: '兴芝林刀剪厂，始于 2013 年。',
+    news_heading: '新闻动态',
+    news1_title: '亮相广交会，厨房剪系列备受海外客商青睐',
+    news1_excerpt: '第 140 届广交会上，兴芝林多款厨房剪刀吸引了来自东南亚、中东的数十家采购商驻足洽谈，现场达成多项合作意向。',
+    news2_title: '新品「鸡骨剪」上市，斩骨如泥好评如潮',
+    news2_excerpt: '加厚锯齿刃口、省力弹簧设计，全新鸡骨剪一经推出便受到餐饮客户与家庭用户的一致好评。',
+    news3_title: '牵手迪拜经销商，深耕中东市场',
+    news3_excerpt: '兴芝林与迪拜头部厨具经销商签署战略合作协议，未来三年将共同开拓中东及北非市场。',
+    footer_signin: '经销商登录', footer_c1: '小批量匠心制造', footer_c2: '兴芝林刀剪厂',
+    footer_c3: '位于中国阳江', footer_c4: '(c) 兴芝林 2026', footer_c5: '所有产品均为原创设计。',
+    contact_addr_label: '地址：', contact_addr: '广东省阳江市阳东区红丰镇兴芝林刀剪厂',
+    contact_tel_label: '电话：',
+    footer_follow: '关注我们', footer_l1: '退款政策', footer_l2: '隐私政策', footer_l3: '服务条款',
+    footer_nl: '订阅资讯', footer_nl_desc: '加入我们的邮件列表，第一时间获取新品动态，首单享 9 折。',
+    footer_nl_ph: '邮箱地址', footer_nl_btn: '订阅',
+    toast_bag: '购物袋功能即将上线，敬请期待。', alert_newsletter: '订阅成功，欢迎加入！'
+  },
+  en: {
+    nav_about: 'ABOUT', nav_bag: '[ BAG ]',
+    menu_close: 'CLOSE ×', menu_products: 'Collection', menu_about: 'About XINGZHILIN', menu_news: 'News', menu_contact: 'Contact',
+    hero_t1: 'FORGED', hero_t2: 'PRECISION', hero_discover: 'DISCOVER', hero_scroll: 'Scroll',
+    anno1: 'Hand-ground edge', anno2: 'XINGZHILIN blueprint',
+    p1_name: 'Obsidian BBQ Shears', p2_name: 'Onyx BBQ Shears', p3_name: 'Magnetic Fridge Scissors',
+    p4_name: 'Bamboo Green Household Shears', p5_name: 'Graphite Magnetic Scissors',
+    reveal_caption: 'One cut, one world — sharpness as attitude.',
+    stats_heading: 'Made Without Compromise',
+    stats_p1: 'Each pair of shears is finished by a single pair of hands — no cold production line, no perfunctory assembly. Material first, form follows its nature.',
+    stats_p2: 'We choose fine stainless steel; every edge is hand-ground and honed, again and again. Balanced weight, razor edge — no detail compromised.',
+    stats_p3: 'XINGZHILIN exists for those who know shears. Not just a tool — a promise. One piece at a time, made to last.',
+    stats_cta: 'VIEW COLLECTION',
+    stat_h0: '13 Years', stat_h1: '50+ Artisans', stat_h2: '20+ Markets', stat_h3: '100% Hand-Finished',
+    stat_d0: 'Thirteen years devoted to blades and shears',
+    stat_d1: 'Over fifty skilled artisans; every pair hand-finished',
+    stat_d2: 'Exported to 20+ countries across Southeast Asia, India, Dubai and beyond',
+    stat_d3: 'Fully inspected before shipping, guaranteed for life',
+    stat_sub: 'Est. XINGZHILIN Shears Factory, 2013.',
+    news_heading: 'News',
+    news1_title: 'Canton Fair debut: kitchen shears win over overseas buyers',
+    news1_excerpt: 'At the 140th Canton Fair, XINGZHILIN shears drew dozens of buyers from Southeast Asia and the Middle East, closing multiple deals on the spot.',
+    news2_title: 'New poultry shears launched to rave reviews',
+    news2_excerpt: 'Thick serrated blades and an effortless spring design — our new poultry shears won over restaurants and home cooks alike.',
+    news3_title: 'Dubai partnership to grow Middle East presence',
+    news3_excerpt: 'XINGZHILIN signed a strategic agreement with a leading Dubai kitchenware distributor to expand across the Middle East and North Africa.',
+    footer_signin: 'Distributor Sign In', footer_c1: 'Handcrafted in small batches', footer_c2: 'XINGZHILIN Shears Factory',
+    footer_c3: 'Based in Yangjiang, China', footer_c4: '(c) XINGZHILIN 2026', footer_c5: 'All pieces are original designs.',
+    contact_addr_label: 'Address: ', contact_addr: 'Xingzhilin Scissors Factory, Hongfeng Town, Yangdong District, Yangjiang, Guangdong, China',
+    contact_tel_label: 'Tel: ',
+    footer_follow: 'Follow Us', footer_l1: 'Refund Policy', footer_l2: 'Privacy Policy', footer_l3: 'Terms of Service',
+    footer_nl: 'Newsletter', footer_nl_desc: 'Join our list. Be first to know new drops. 10% off your first order.',
+    footer_nl_ph: 'Email', footer_nl_btn: 'SUBSCRIBE',
+    toast_bag: 'Shopping bag coming soon.', alert_newsletter: "You're on the list. Welcome."
+  }
+};
+let LANG = 'zh';
+
+function applyI18n() {
+  const dict = I18N[LANG];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (dict[k] !== undefined) el.textContent = dict[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.getAttribute('data-i18n-ph');
+    if (dict[k] !== undefined) el.setAttribute('placeholder', dict[k]);
+  });
+  // hero title lines
+  document.querySelectorAll('[data-title-line]').forEach(el => {
+    const idx = el.getAttribute('data-title-line');
+    el.textContent = dict[idx === '0' ? 'hero_t1' : 'hero_t2'];
+  });
+  // stat headings + details
+  document.querySelectorAll('[data-stat]').forEach(el => {
+    el.textContent = dict['stat_h' + el.getAttribute('data-stat')];
+  });
+  document.querySelectorAll('[data-detail]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (dict[k] !== undefined) el.textContent = dict[k];
+  });
+  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('.lang-opt').forEach(o =>
+    o.classList.toggle('active', o.dataset.lang === LANG));
+}
+
+/* ---------------- TEXT SPLITTING ---------------- */
+function splitChars(el, cls) {
+  const text = el.textContent;
+  el.innerHTML = '';
+  [...text].forEach(ch => {
+    const s = document.createElement('span');
+    s.className = cls;
+    s.textContent = ch === ' ' ? '\u00A0' : ch;
+    el.appendChild(s);
+  });
+}
+function splitWords(el, cls) {
+  const words = el.textContent.trim().split(/\s+/);
+  el.innerHTML = '';
+  words.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.className = cls;
+    s.textContent = w;
+    el.appendChild(s);
+    if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
+  });
+}
+function splitAll() {
+  document.querySelectorAll('.hero-title-line-inner').forEach(el => splitChars(el, 'hero-char'));
+  document.querySelectorAll('.heading-style-h1[data-stat]').forEach(el => splitChars(el, 'stat-char'));
+  document.querySelectorAll('.detail-paragraph').forEach(el => splitWords(el, 'detail-word'));
+}
+
+/* ---------------- HELIX FLOW HERO ----------------
+   Scroll-driven: blueprint reveals via spiral conic mask, rotates along a
+   helical path, annotations fade in staggered. Mouse: 3D tilt follows cursor.
+   Canvas: triple-arm helix particle flow, speed boosted by scroll. */
+const heroSticky = document.getElementById('heroSticky');
+const blueprintTilt = document.getElementById('blueprintTilt');
+const blueprintHelix = document.getElementById('blueprintHelix');
+const helixCanvas = document.getElementById('helixCanvas');
+const hctx = helixCanvas.getContext('2d');
+let helixW = 0, helixH = 0;
+function sizeHelixCanvas() {
+  const r = heroSticky.getBoundingClientRect();
+  helixW = helixCanvas.width = Math.max(1, Math.floor(r.width));
+  helixH = helixCanvas.height = Math.max(1, Math.floor(r.height));
+}
+
+const helix = { spiral: 0, rot: -10, scale: 0.85 };
+const tilt = { x: 0, y: 0, tx: 0, ty: 0 };
+heroSticky.addEventListener('mousemove', e => {
+  const r = heroSticky.getBoundingClientRect();
+  tilt.tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+  tilt.ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
+});
+heroSticky.addEventListener('mouseleave', () => { tilt.tx = 0; tilt.ty = 0; });
+
+// triple-arm helix particles
+const helixParts = [];
+for (let i = 0; i < 170; i++) {
+  helixParts.push({
+    arm: i % 3,
+    t: Math.random() * Math.PI * 2,
+    r: 150 + Math.random() * 380,
+    sp: 0.0025 + Math.random() * 0.005,
+    sz: 0.8 + Math.random() * 2.2,
+    crimson: Math.random() < 0.16
+  });
+}
+function drawHelixParticles(p, time) {
+  hctx.clearRect(0, 0, helixW, helixH);
+  const cx = helixW / 2, cy = helixH * 0.42;
+  const boost = 1 + p * 3.2;
+  for (const pt of helixParts) {
+    pt.t += pt.sp * boost;
+    const a = pt.t + pt.arm * (Math.PI * 2 / 3);
+    const x = cx + Math.cos(a) * pt.r;
+    const y = cy + Math.sin(a) * pt.r * 0.30 - p * 130 + Math.sin(time * 0.0011 + pt.t * 2) * 14;
+    const z = (Math.sin(a) + 1) / 2;
+    const alpha = (0.06 + z * 0.5) * (0.35 + p * 0.65);
+    hctx.beginPath();
+    hctx.arc(x, y, pt.sz * (0.6 + z * 0.9), 0, Math.PI * 2);
+    hctx.fillStyle = pt.crimson
+      ? 'rgba(163,17,30,' + alpha.toFixed(3) + ')'
+      : 'rgba(255,255,255,' + (alpha * 0.75).toFixed(3) + ')';
+    hctx.fill();
+  }
+}
+
+/* ---------------- VIDEO SCRUB CORE (reveal video) ----------------
+   The !video.seeking guard is essential: only update currentTime
+   when the decoder has finished the previous seek. */
+const revealVideo = document.getElementById('revealVideo');
+const scrub = { reveal: { target: 0, current: 0 } };
+if (revealVideo) {
+  revealVideo.pause();
+  revealVideo.addEventListener('error', () => {}, true);
+}
+
+function heroProgress() {
+  const hero = document.getElementById('hero');
+  const total = hero.offsetHeight - window.innerHeight;
+  if (total <= 0) return 0;
+  const p = -hero.getBoundingClientRect().top / total;
+  return Math.min(1, Math.max(0, p));
+}
+
+let carouselTL = null;
+
+function scrubTick() {
+  const now = performance.now();
+  // --- helix blueprint (scroll-driven) ---
+  const hp = heroProgress();
+  const rp = Math.min(1, hp / 0.62); // reveal over first 62% of scroll
+  helix.spiral += (rp * 720 - helix.spiral) * 0.12;
+  helix.rot += ((-10 + hp * 22) - helix.rot) * 0.12;
+  helix.scale += ((0.82 + hp * 0.24) - helix.scale) * 0.12;
+  blueprintHelix.style.setProperty('--spiral', helix.spiral.toFixed(1));
+  const driftX = Math.sin(hp * Math.PI * 2) * 34;
+  const driftY = Math.cos(hp * Math.PI * 2) * 20 - hp * 40;
+  blueprintHelix.style.transform =
+    'rotate(' + helix.rot.toFixed(2) + 'deg) scale(' + helix.scale.toFixed(3) + ')' +
+    ' translate(' + driftX.toFixed(1) + 'px,' + driftY.toFixed(1) + 'px)';
+  // --- mouse tilt (lerped) ---
+  tilt.x += (tilt.tx - tilt.x) * 0.08;
+  tilt.y += (tilt.ty - tilt.y) * 0.08;
+  blueprintTilt.style.transform =
+    'rotateY(' + (tilt.x * 13).toFixed(2) + 'deg) rotateX(' + (-tilt.y * 11).toFixed(2) + 'deg)';
+  // --- annotations stagger in ---
+  const annos = document.querySelectorAll('.anno');
+  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.28 + i * 0.14));
+  // --- helix particles ---
+  if (helixW > 0) drawHelixParticles(hp, now);
+  // --- hero text exit (progress > 80%) ---
+  const chars = document.querySelectorAll('.hero-char');
+  const discoverBtn = document.getElementById('discoverBtn');
+  const hint = document.querySelector('.hero-scroll-hint');
+  if (hp > 0.8 && chars.length) {
+    const ep = (hp - 0.8) / 0.2;
+    chars.forEach((ch, i) => {
+      const stagger = (i / chars.length) * 0.55;
+      const cp = Math.min(1, Math.max(0, (ep - stagger) / 0.45));
+      const e = cp * cp * cp; // cubic ease
+      ch.style.opacity = String(1 - e);
+      ch.style.filter = 'blur(' + (e * 8).toFixed(2) + 'px)';
+      ch.style.transform = 'translateY(' + (-e * 44).toFixed(1) + 'px)';
+    });
+    const bp = Math.pow(ep, 4);
+    if (discoverBtn) {
+      discoverBtn.style.opacity = String(1 - bp);
+      discoverBtn.style.transform = 'translateY(' + (-bp * 30).toFixed(1) + 'px)';
+    }
+    if (hint) hint.style.opacity = '0';
+  } else if (chars.length) {
+    chars.forEach(ch => { ch.style.opacity = '1'; ch.style.filter = 'blur(0px)'; ch.style.transform = 'translateY(0)'; });
+    if (discoverBtn) { discoverBtn.style.opacity = '1'; discoverBtn.style.transform = 'translateY(0)'; }
+    if (hint) hint.style.opacity = '';
+  }
+  // --- reveal video (driven by carousel timeline progress) ---
+  const wrapper = document.getElementById('videoScalingWrapper');
+  if (carouselTL && revealVideo.duration) {
+    const tp = carouselTL.progress();
+    const rp = Math.min(1, Math.max(0, (tp - 0.625) / 0.375)); // phase 2 window
+    scrub.reveal.target = rp * revealVideo.duration;
+    if (wrapper) wrapper.classList.toggle('active', rp > 0.03);
+  }
+  scrub.reveal.current += (scrub.reveal.target - scrub.reveal.current) * 0.08;
+  if (revealVideo.duration && !revealVideo.seeking &&
+      Math.abs(revealVideo.currentTime - scrub.reveal.current) > 0.01) {
+    try { revealVideo.currentTime = scrub.reveal.current; } catch (e) {}
+  }
+  requestAnimationFrame(scrubTick);
+}
+
+/* ---------------- SCROLL FX (rebuildable) ---------------- */
+function buildScrollFX() {
+  ScrollTrigger.getAll().forEach(st => st.kill());
+  if (carouselTL) { carouselTL.kill(); carouselTL = null; }
+  splitAll();
+
+  // --- Awards: pinned horizontal scroll + video reveal ---
+  const grid = document.getElementById('awardsGrid');
+  const getDist = () => Math.max(0, grid.scrollWidth - window.innerWidth);
+  gsap.set(grid, { x: 0 });
+  carouselTL = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#products',
+      start: 'top top',
+      end: () => '+=' + (getDist() + window.innerHeight),
+      pin: true,
+      scrub: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true
+    }
+  });
+  carouselTL.to(grid, { x: () => -getDist(), ease: 'none', duration: 1 }, 0);
+  carouselTL.fromTo('#videoScalingWrapper', { width: '0%' }, {
+    width: '100%', ease: 'none', duration: 0.6
+  }, 1);
+
+  // --- Left column fade+slide ---
+  gsap.utils.toArray('[data-fade-slide-in]').forEach(el => {
+    gsap.fromTo(el, { autoAlpha: 0, y: 20 }, {
+      autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' }
+    });
+  });
+
+  // --- Stat cards: char / word reveal ---
+  document.querySelectorAll('.stat-card').forEach(card => {
+    const chars = card.querySelectorAll('.stat-char');
+    const words = card.querySelectorAll('.detail-word');
+    if (chars.length) {
+      gsap.fromTo(chars, { opacity: 0.12, y: 12 }, {
+        opacity: 1, y: 0, stagger: 0.035, duration: 0.5, ease: 'power2.out',
+        scrollTrigger: { trigger: card, start: 'top 78%' }
+      });
+    }
+    if (words.length) {
+      gsap.fromTo(words, { opacity: 0.1 }, {
+        opacity: 1, stagger: 0.02, duration: 0.4, ease: 'power1.out',
+        scrollTrigger: { trigger: card, start: 'top 70%' }
+      });
+    }
+  });
+
+  sizeFooterSpacer();
+  ScrollTrigger.refresh();
+}
+
+function sizeFooterSpacer() {
+  const f = document.getElementById('siteFooter');
+  const s = document.getElementById('footerSpacer');
+  if (f && s) s.style.height = f.offsetHeight + 'px';
+}
+
+/* ---------------- INTERACTIONS ---------------- */
+document.getElementById('discoverBtn').addEventListener('click', () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+});
+document.getElementById('viewCollectionBtn').addEventListener('click', () => {
+  document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+});
+document.querySelector('.about-link').addEventListener('click', e => {
+  e.preventDefault();
+  document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+});
+
+// menu overlay
+const overlay = document.getElementById('menuOverlay');
+document.getElementById('menuBtn').addEventListener('click', () => overlay.classList.add('open'));
+document.getElementById('menuClose').addEventListener('click', () => overlay.classList.remove('open'));
+overlay.querySelectorAll('nav a').forEach(a =>
+  a.addEventListener('click', () => overlay.classList.remove('open')));
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') overlay.classList.remove('open');
+});
+
+// bag toast
+const toast = document.createElement('div');
+toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#000;color:#fff;font-size:14px;padding:12px 24px;border-radius:100px;z-index:300;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;';
+document.body.appendChild(toast);
+let toastTimer = null;
+document.getElementById('bagBtn').addEventListener('click', () => {
+  toast.textContent = I18N[LANG].toast_bag;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2200);
+});
+
+// newsletter
+document.getElementById('newsletterForm').addEventListener('submit', e => {
+  e.preventDefault();
+  alert(I18N[LANG].alert_newsletter);
+  document.getElementById('newsletterEmail').value = '';
+});
+
+// language toggle
+document.getElementById('langToggle').addEventListener('click', () => {
+  LANG = LANG === 'zh' ? 'en' : 'zh';
+  applyI18n();
+  buildScrollFX();
+});
+
+/* ---------------- RESIZE (debounced rebuild) ---------------- */
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    sizeFooterSpacer();
+    sizeHelixCanvas();
+    buildScrollFX();
+  }, 200);
+});
+
+/* ---------------- INIT (on fonts ready — don't wait for video) ---------------- */
+applyI18n();
+sizeHelixCanvas();
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    buildScrollFX();
+    sizeHelixCanvas();
+    requestAnimationFrame(scrubTick);
+  });
+} else {
+  window.addEventListener('DOMContentLoaded', () => {
+    buildScrollFX();
+    sizeHelixCanvas();
+    requestAnimationFrame(scrubTick);
+  });
+}
+window.addEventListener('load', () => sizeFooterSpacer());
+</script>
+</body>
+</html>
