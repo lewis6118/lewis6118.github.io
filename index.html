@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <style>
 /* ============ RESET & TOKENS ============ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -140,33 +141,54 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
 }
 @keyframes hintDrop { 0% { transform: scaleY(0); transform-origin: top; } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 
-/* ============ HERO HELIX FLOW (blueprint) ============ */
+/* ============ HERO FORGE 3D ============ */
 .hero-sticky { background: #060a14; }
-.helix-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }
-.blueprint-grid {
+.forge-grid {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
-  background-size: 52px 52px;
-  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 44%, #000 25%, transparent 78%);
-  mask-image: radial-gradient(ellipse 75% 65% at 50% 44%, #000 25%, transparent 78%);
+    linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 20%, transparent 75%);
 }
-.blueprint-stage {
-  position: absolute; inset: 0; z-index: 2;
-  display: flex; align-items: center; justify-content: center;
-  perspective: 1400px; pointer-events: none;
+.dust-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.forge3d-canvas {
+  position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%;
+  touch-action: pan-y; cursor: grab;
 }
-.blueprint-tilt {
-  position: relative; transform-style: preserve-3d; will-change: transform;
+.forge-finale {
+  position: absolute; inset: 0; z-index: 3; opacity: 0; pointer-events: none;
+  overflow: hidden; background: #000;
 }
-.blueprint-helix { will-change: transform; --spiral: 0; }
-.blueprint-img {
-  max-width: min(88vw, 1150px); max-height: 54vh; width: auto; height: auto;
-  filter: drop-shadow(0 0 26px rgba(163, 17, 30, 0.28)) drop-shadow(0 0 70px rgba(255,255,255,0.07));
-  -webkit-mask-image: conic-gradient(from 0deg, #000 calc(var(--spiral) * 1deg), transparent calc(var(--spiral) * 1deg));
-  mask-image: conic-gradient(from 0deg, #000 calc(var(--spiral) * 1deg), transparent calc(var(--spiral) * 1deg));
+.forge-img {
+  position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover;
+  will-change: transform;
 }
+.forge-shade {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 42%, transparent 30%, rgba(0,0,0,0.55) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 42%, rgba(0,0,0,0.35) 100%);
+}
+.ember-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.forge-caption {
+  position: absolute; left: 0; right: 0; bottom: 9%; text-align: center;
+  color: #fff; pointer-events: none;
+}
+.forge-caption-kicker {
+  font-size: 13px; letter-spacing: 0.5em; text-indent: 0.5em;
+  color: var(--color-accent); margin-bottom: 14px; font-weight: 500;
+}
+.forge-caption h2 {
+  font-size: clamp(38px, 6vw, 72px); font-weight: 600; letter-spacing: 0.12em;
+  text-indent: 0.12em; margin: 0 0 12px;
+}
+.forge-caption p {
+  font-size: 14px; letter-spacing: 0.3em; text-indent: 0.3em;
+  color: rgba(255,255,255,0.65); margin: 0;
+}
+.anno-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .anno {
   position: absolute; display: flex; align-items: center; gap: 10px;
   font-size: 13px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
@@ -180,9 +202,23 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
 }
 .anno b { font-weight: 500; }
 .anno.on { opacity: 1; transform: translateY(0); }
-.anno[data-anno="0"] { top: 30%; left: 8%; }
-.anno[data-anno="1"] { top: 20%; left: 62%; }
-.anno[data-anno="2"] { top: 74%; left: 66%; }
+.anno[data-anno="0"] { top: 32%; left: 9%; }
+.anno[data-anno="1"] { top: 22%; left: 63%; }
+.anno[data-anno="2"] { top: 72%; left: 64%; }
+.phase-hint {
+  position: absolute; left: 0; right: 0; bottom: 26px; z-index: 5;
+  text-align: center; font-size: 12px; letter-spacing: 0.28em; text-indent: 0.28em;
+  color: rgba(255,255,255,0.5); pointer-events: none;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.phase-hint.on { opacity: 1; transform: translateY(0); }
+.phase-hint .dot {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--color-accent); margin-right: 10px; vertical-align: 1px;
+  animation: hintPulse 1.6s ease-in-out infinite;
+}
+@keyframes hintPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
 
 /* ============ PRODUCT CAROUSEL ============ */
 .awards-section {
@@ -378,20 +414,26 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
 
 <main class="page-content">
 
-  <!-- ================= HERO : scroll-driven helix flow ================= -->
+  <!-- ================= HERO : forge 3D exploded > assemble > craftsman ================= -->
   <section class="hero-section" id="hero">
     <div class="hero-sticky" id="heroSticky">
-      <canvas class="helix-canvas" id="helixCanvas"></canvas>
-      <div class="blueprint-grid"></div>
-      <div class="blueprint-stage">
-        <div class="blueprint-tilt" id="blueprintTilt">
-          <div class="blueprint-helix" id="blueprintHelix">
-            <img class="blueprint-img" src="/images/xingzhilin-images/blueprint.webp" alt="兴芝林设计手稿" />
-          </div>
-          <span class="anno" data-anno="0"><i></i><b data-i18n="anno1">手工研磨刃口</b></span>
-          <span class="anno" data-anno="1"><i></i><b>230 mm</b></span>
-          <span class="anno" data-anno="2"><i></i><b data-i18n="anno2">兴芝林设计手稿</b></span>
+      <div class="forge-grid"></div>
+      <canvas class="dust-canvas" id="dustCanvas"></canvas>
+      <canvas class="forge3d-canvas" id="forge3dCanvas"></canvas>
+      <div class="forge-finale" id="forgeFinale">
+        <img class="forge-img" id="forgeImg" src="/images/xingzhilin-images/forge-craftsman.jpg" alt="工匠锻造" />
+        <div class="forge-shade"></div>
+        <canvas class="ember-canvas" id="emberCanvas"></canvas>
+        <div class="forge-caption">
+          <div class="forge-caption-kicker" data-i18n="forge_kicker">匠心</div>
+          <h2 data-i18n="forge_title">千锤百炼</h2>
+          <p data-i18n="forge_sub">烈火淬炼，方成利刃</p>
         </div>
+      </div>
+      <div class="anno-layer" id="annoLayer">
+        <span class="anno" data-anno="0"><i></i><b data-i18n="anno1">手工研磨刃口</b></span>
+        <span class="anno" data-anno="1"><i></i><b>230 mm</b></span>
+        <span class="anno" data-anno="2"><i></i><b data-i18n="anno2">兴芝林设计手稿</b></span>
       </div>
       <div class="hero-content">
         <h1 class="hero-title" aria-label="精工利刃">
@@ -405,6 +447,7 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
         </div>
       </div>
       <div class="hero-scroll-hint" data-i18n="hero_scroll">向下滚动</div>
+      <div class="phase-hint" id="phaseHint"><span class="dot"></span><span data-i18n="drag_hint">拖拽旋转 · 滚动组装</span></div>
     </div>
   </section>
 
@@ -440,6 +483,7 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
     <div class="video-scaling-wrapper" id="videoScalingWrapper">
       <video class="reveal-video" id="revealVideo" muted playsinline preload="auto"
              poster="/images/xingzhilin-images/product-5.webp" disablepictureinpicture>
+        <source src="/videos/craft-reveal.mp4" type="video/mp4" />
       </video>
       <div class="reveal-caption" data-i18n="reveal_caption">一剪一世界，锋利即态度。</div>
     </div>
@@ -571,6 +615,8 @@ const I18N = {
     menu_close: '关闭 ×', menu_products: '产品系列', menu_about: '关于兴芝林', menu_news: '新闻动态', menu_contact: '联系我们',
     hero_t1: '精工', hero_t2: '利刃', hero_discover: '探索', hero_scroll: '向下滚动',
     anno1: '手工研磨刃口', anno2: '兴芝林设计手稿',
+    forge_kicker: '匠心', forge_title: '千锤百炼', forge_sub: '烈火淬炼，方成利刃',
+    drag_hint: '拖拽旋转 · 滚动组装',
     p1_name: '曜石烤肉剪', p2_name: '臻黑烤肉剪', p3_name: '磁吸冰箱剪',
     p4_name: '青竹家用剪', p5_name: '墨灰磁吸剪',
     reveal_caption: '一剪一世界，锋利即态度。',
@@ -604,6 +650,8 @@ const I18N = {
     menu_close: 'CLOSE ×', menu_products: 'Collection', menu_about: 'About XINGZHILIN', menu_news: 'News', menu_contact: 'Contact',
     hero_t1: 'FORGED', hero_t2: 'PRECISION', hero_discover: 'DISCOVER', hero_scroll: 'Scroll',
     anno1: 'Hand-ground edge', anno2: 'XINGZHILIN blueprint',
+    forge_kicker: 'CRAFTSMANSHIP', forge_title: 'Forged by Hand', forge_sub: 'From fire, into edge',
+    drag_hint: 'Drag to rotate · Scroll to assemble',
     p1_name: 'Obsidian BBQ Shears', p2_name: 'Onyx BBQ Shears', p3_name: 'Magnetic Fridge Scissors',
     p4_name: 'Bamboo Green Household Shears', p5_name: 'Graphite Magnetic Scissors',
     reveal_caption: 'One cut, one world — sharpness as attitude.',
@@ -693,61 +741,244 @@ function splitAll() {
   document.querySelectorAll('.detail-paragraph').forEach(el => splitWords(el, 'detail-word'));
 }
 
-/* ---------------- HELIX FLOW HERO ----------------
-   Scroll-driven: blueprint reveals via spiral conic mask, rotates along a
-   helical path, annotations fade in staggered. Mouse: 3D tilt follows cursor.
-   Canvas: triple-arm helix particle flow, speed boosted by scroll. */
+/* ---------------- FORGE 3D HERO ----------------
+   Phase 0.00-0.12: exploded parts, slow orbit
+   Phase 0.12-0.52: scroll assembles parts (staggered)
+   Phase 0.52-0.76: showcase — drag to rotate, annotations in
+   Phase 0.76-1.00: crossfade to craftsman forge finale */
 const heroSticky = document.getElementById('heroSticky');
-const blueprintTilt = document.getElementById('blueprintTilt');
-const blueprintHelix = document.getElementById('blueprintHelix');
-const helixCanvas = document.getElementById('helixCanvas');
-const hctx = helixCanvas.getContext('2d');
-let helixW = 0, helixH = 0;
-function sizeHelixCanvas() {
-  const r = heroSticky.getBoundingClientRect();
-  helixW = helixCanvas.width = Math.max(1, Math.floor(r.width));
-  helixH = helixCanvas.height = Math.max(1, Math.floor(r.height));
-}
+const forgeCanvas = document.getElementById('forge3dCanvas');
+const dustCanvas = document.getElementById('dustCanvas');
+const emberCanvas = document.getElementById('emberCanvas');
+const forgeFinale = document.getElementById('forgeFinale');
+const forgeImg = document.getElementById('forgeImg');
+const phaseHint = document.getElementById('phaseHint');
+const dctx = dustCanvas.getContext('2d');
+const ectx = emberCanvas.getContext('2d');
+let dustW = 0, dustH = 0;
 
-const helix = { spiral: 0, rot: -10, scale: 0.85 };
-const tilt = { x: 0, y: 0, tx: 0, ty: 0 };
-heroSticky.addEventListener('mousemove', e => {
+function sizeForge() {
   const r = heroSticky.getBoundingClientRect();
-  tilt.tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-  tilt.ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
-});
-heroSticky.addEventListener('mouseleave', () => { tilt.tx = 0; tilt.ty = 0; });
-
-// triple-arm helix particles
-const helixParts = [];
-for (let i = 0; i < 170; i++) {
-  helixParts.push({
-    arm: i % 3,
-    t: Math.random() * Math.PI * 2,
-    r: 150 + Math.random() * 380,
-    sp: 0.0025 + Math.random() * 0.005,
-    sz: 0.8 + Math.random() * 2.2,
-    crimson: Math.random() < 0.16
-  });
-}
-function drawHelixParticles(p, time) {
-  hctx.clearRect(0, 0, helixW, helixH);
-  const cx = helixW / 2, cy = helixH * 0.42;
-  const boost = 1 + p * 3.2;
-  for (const pt of helixParts) {
-    pt.t += pt.sp * boost;
-    const a = pt.t + pt.arm * (Math.PI * 2 / 3);
-    const x = cx + Math.cos(a) * pt.r;
-    const y = cy + Math.sin(a) * pt.r * 0.30 - p * 130 + Math.sin(time * 0.0011 + pt.t * 2) * 14;
-    const z = (Math.sin(a) + 1) / 2;
-    const alpha = (0.06 + z * 0.5) * (0.35 + p * 0.65);
-    hctx.beginPath();
-    hctx.arc(x, y, pt.sz * (0.6 + z * 0.9), 0, Math.PI * 2);
-    hctx.fillStyle = pt.crimson
-      ? 'rgba(163,17,30,' + alpha.toFixed(3) + ')'
-      : 'rgba(255,255,255,' + (alpha * 0.75).toFixed(3) + ')';
-    hctx.fill();
+  dustW = dustCanvas.width = Math.max(1, Math.floor(r.width));
+  dustH = dustCanvas.height = Math.max(1, Math.floor(r.height));
+  emberCanvas.width = dustW; emberCanvas.height = dustH;
+  if (forgeRenderer) {
+    forgeRenderer.setSize(Math.floor(r.width), Math.floor(r.height), false);
+    forgeCamera.aspect = r.width / Math.max(1, r.height);
+    forgeCamera.updateProjectionMatrix();
+    fitShears();
   }
+}
+function fitShears() {
+  if (!shears) return;
+  const a = forgeCamera.aspect || 1.6;
+  shears.scale.setScalar(0.78 * Math.max(0.55, Math.min(1, a / 1.5)));
+}
+
+// --- math helpers ---
+const clamp01 = v => Math.min(1, Math.max(0, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (e0, e1, x) => { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+const easeIO = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+// --- three.js scene ---
+let forgeRenderer = null, forgeCamera = null, shears = null;
+const partList = [];
+let webglOK = false;
+
+function bladeShape() {
+  const s = new THREE.Shape();
+  s.moveTo(20, 13);
+  s.quadraticCurveTo(-60, 24, -140, 27);
+  s.quadraticCurveTo(-182, 27, -196, 18);
+  s.quadraticCurveTo(-120, 4, -50, -3);
+  s.quadraticCurveTo(-12, -7, 18, -11);
+  s.closePath();
+  return s;
+}
+function gripShape() {
+  const s = new THREE.Shape();
+  s.moveTo(-10, 22);
+  s.quadraticCurveTo(55, 36, 118, 32);
+  s.quadraticCurveTo(170, 28, 174, 2);
+  s.quadraticCurveTo(170, -24, 118, -30);
+  s.quadraticCurveTo(55, -34, -10, -20);
+  s.closePath();
+  const hole = new THREE.Path();
+  hole.absellipse(92, 0, 46, 20, 0, Math.PI * 2, true);
+  s.holes.push(hole);
+  return s;
+}
+function extrudePart(shape, depth, mat, bevel, edgeMat) {
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel,
+    bevelSegments: 2, curveSegments: 28
+  });
+  geo.center();
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(geo, mat));
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 26), edgeMat));
+  return g;
+}
+function buildScrew(edgeMat) {
+  const g = new THREE.Group();
+  const sm = new THREE.MeshStandardMaterial({ color: 0x3a404c, metalness: 0.95, roughness: 0.28, side: THREE.DoubleSide });
+  const shaft = new THREE.CylinderGeometry(11, 11, 30, 24); shaft.rotateX(Math.PI / 2);
+  const cap = new THREE.CylinderGeometry(16.5, 16.5, 7, 28); cap.rotateX(Math.PI / 2); cap.translate(0, 0, 17);
+  const m1 = new THREE.Mesh(shaft, sm), m2 = new THREE.Mesh(cap, sm);
+  [m1, m2].forEach(m => m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 26), edgeMat)));
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(16.5, 1.7, 10, 40),
+    new THREE.MeshStandardMaterial({ color: 0xa3111e, metalness: 0.6, roughness: 0.4, emissive: 0x4a0000 })
+  );
+  ring.position.z = 17;
+  g.add(m1, m2, ring);
+  return g;
+}
+function buildSpring(edgeMat) {
+  const g = new THREE.Group();
+  const geo = new THREE.TorusGeometry(20, 5, 12, 32, 4.6);
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x8a8f9c, metalness: 0.9, roughness: 0.3, side: THREE.DoubleSide }));
+  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 26), edgeMat));
+  g.add(m);
+  return g;
+}
+
+function initForge3D() {
+  forgeRenderer = new THREE.WebGLRenderer({ canvas: forgeCanvas, alpha: true, antialias: true });
+  forgeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene();
+  forgeCamera = new THREE.PerspectiveCamera(34, 1, 1, 4000);
+  forgeCamera.position.set(0, 30, 660);
+  forgeCamera.lookAt(0, 0, 0);
+
+  scene.add(new THREE.HemisphereLight(0x9aa4bd, 0x04060b, 0.5));
+  const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(240, 280, 460); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xc22030, 0.9); rim.position.set(-280, -60, -320); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0x54648c, 0.45); fill.position.set(-200, 180, 320); scene.add(fill);
+
+  const steel = new THREE.MeshStandardMaterial({ color: 0x2b303a, metalness: 0.88, roughness: 0.34, side: THREE.DoubleSide });
+  const gripM = new THREE.MeshStandardMaterial({ color: 0x101216, metalness: 0.3, roughness: 0.58, side: THREE.DoubleSide });
+  const edgeM = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.20 });
+
+  shears = new THREE.Group();
+  scene.add(shears);
+  initForge3D.scene = scene;
+
+  const defs = [
+    { build: () => extrudePart(bladeShape(), 7, steel, 1.1, edgeM), ex: { x: -26, y: 10, z: 150, rz: 0.10 }, az: 4 },
+    { build: () => extrudePart(bladeShape(), 7, steel, 1.1, edgeM), mirror: true, ex: { x: -14, y: -8, z: 78, rz: -0.10 }, az: -4 },
+    { build: () => extrudePart(gripShape(), 15, gripM, 2.2, edgeM), ex: { x: 16, y: 12, z: -78, rz: 0.08 }, az: 0 },
+    { build: () => extrudePart(gripShape(), 15, gripM, 2.2, edgeM), mirror: true, ex: { x: 28, y: -10, z: -150, rz: -0.08 }, az: 0 },
+    { build: () => buildScrew(edgeM), ex: { x: 0, y: 44, z: 238, rz: 0 }, az: 0 },
+    { build: () => buildSpring(edgeM), ex: { x: 30, y: -64, z: -238, rz: 0 }, az: 0 }
+  ];
+  defs.forEach(d => {
+    const g = d.build();
+    if (d.mirror) g.scale.y = -1;
+    g.position.set(d.ex.x, d.ex.y, d.ex.z);
+    g.rotation.z = d.ex.rz || 0;
+    g.userData = d;
+    shears.add(g);
+    partList.push(g);
+  });
+  fitShears();
+}
+try { initForge3D(); webglOK = true; } catch (err) { webglOK = false; }
+
+// --- drag to rotate ---
+let dragging = false, lastPX = 0, lastPY = 0;
+let userRotY = 0, userRotX = 0;
+forgeCanvas.addEventListener('pointerdown', e => {
+  dragging = true; lastPX = e.clientX; lastPY = e.clientY;
+  forgeCanvas.style.cursor = 'grabbing';
+  try { forgeCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+});
+forgeCanvas.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  userRotY += (e.clientX - lastPX) * 0.006;
+  userRotX = Math.max(-0.55, Math.min(0.55, userRotX + (e.clientY - lastPY) * 0.004));
+  lastPX = e.clientX; lastPY = e.clientY;
+});
+const endDrag = () => { dragging = false; forgeCanvas.style.cursor = 'grab'; };
+forgeCanvas.addEventListener('pointerup', endDrag);
+forgeCanvas.addEventListener('pointercancel', endDrag);
+
+// --- ambient dust (subtle) ---
+const dustParts = [];
+for (let i = 0; i < 55; i++) dustParts.push({
+  x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.8,
+  s: 0.0002 + Math.random() * 0.0006, a: 0.04 + Math.random() * 0.10,
+  cr: Math.random() < 0.12, ph: Math.random() * 6.28
+});
+function drawDust(t) {
+  dctx.clearRect(0, 0, dustW, dustH);
+  for (const p of dustParts) {
+    p.y -= p.s; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+    const tw = 0.7 + 0.3 * Math.sin(t * 0.001 + p.ph);
+    dctx.beginPath();
+    dctx.arc(p.x * dustW, p.y * dustH, p.r, 0, 6.283);
+    dctx.fillStyle = p.cr
+      ? 'rgba(163,17,30,' + (p.a * tw).toFixed(3) + ')'
+      : 'rgba(255,255,255,' + (p.a * 0.8 * tw).toFixed(3) + ')';
+    dctx.fill();
+  }
+}
+
+// --- forge embers ---
+const embers = [];
+for (let i = 0; i < 70; i++) embers.push({
+  x: 0.15 + Math.random() * 0.7, y: Math.random(),
+  r: 0.8 + Math.random() * 2.2, vy: 0.0012 + Math.random() * 0.003,
+  sway: Math.random() * 6.28, life: 0.6 + Math.random() * 0.4,
+  hot: Math.random() < 0.4
+});
+function drawEmbers(t, fp) {
+  ectx.clearRect(0, 0, dustW, dustH);
+  if (fp <= 0.01) return;
+  for (const p of embers) {
+    p.y -= p.vy; p.sway += 0.02;
+    if (p.y < -0.03) { p.y = 1.05; p.x = 0.15 + Math.random() * 0.7; }
+    const fl = 0.6 + 0.4 * Math.sin(t * 0.02 + p.sway * 3);
+    const alpha = (fp * p.life * fl).toFixed(3);
+    ectx.beginPath();
+    ectx.arc(p.x * dustW + Math.sin(p.sway) * 22, p.y * dustH, p.r, 0, 6.283);
+    ectx.fillStyle = p.hot ? 'rgba(255,120,40,' + alpha + ')' : 'rgba(200,50,30,' + alpha + ')';
+    ectx.fill();
+  }
+}
+
+// --- per-frame 3D update ---
+let forgeT = 0, autoRotY = 0;
+function updateForge3D(hp, dt) {
+  if (!webglOK) return;
+  forgeT += dt;
+  const asmP = sstep(0.10, 0.52, hp);
+  partList.forEach((g, i) => {
+    const d = g.userData;
+    const local = clamp01((asmP - i * 0.085) / (1 - 5 * 0.085));
+    const e = easeIO(local);
+    g.position.set(lerp(d.ex.x, 0, e), lerp(d.ex.y, 0, e), lerp(d.ex.z, d.az, e));
+    g.rotation.z = lerp(d.ex.rz || 0, 0, e);
+  });
+  autoRotY += dt * (0.22 * (1 - asmP) + 0.10);
+  shears.rotation.y = autoRotY + userRotY;
+  shears.rotation.x = userRotX + Math.sin(forgeT * 0.6) * 0.035;
+  shears.position.y = Math.sin(forgeT * 0.9) * 7;
+  forgeCamera.position.z = lerp(690, 600, asmP);
+  forgeCamera.position.y = lerp(60, 26, asmP);
+  forgeCamera.lookAt(0, 0, 0);
+  forgeRenderer.render(initForge3D.scene, forgeCamera);
+  // finale crossfade
+  const fp = sstep(0.74, 0.93, hp);
+  forgeFinale.style.opacity = fp.toFixed(3);
+  forgeCanvas.style.opacity = Math.max(0, 1 - fp * 1.35).toFixed(3);
+  forgeImg.style.transform = 'scale(' + (1.06 + fp * 0.14).toFixed(3) + ')';
+  // annotations during showcase
+  const annos = document.querySelectorAll('.anno');
+  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.54 + i * 0.05 && hp < 0.78));
+  phaseHint.classList.toggle('on', hp > 0.50 && hp < 0.74);
+  return fp;
 }
 
 /* ---------------- VIDEO SCRUB CORE (reveal video) ----------------
@@ -772,28 +1003,13 @@ let carouselTL = null;
 
 function scrubTick() {
   const now = performance.now();
-  // --- helix blueprint (scroll-driven) ---
+  const dt = Math.min(0.05, (now - (scrubTick._last || now)) / 1000);
+  scrubTick._last = now;
+  // --- forge 3D hero ---
   const hp = heroProgress();
-  const rp = Math.min(1, hp / 0.62); // reveal over first 62% of scroll
-  helix.spiral += (rp * 720 - helix.spiral) * 0.12;
-  helix.rot += ((-10 + hp * 22) - helix.rot) * 0.12;
-  helix.scale += ((0.82 + hp * 0.24) - helix.scale) * 0.12;
-  blueprintHelix.style.setProperty('--spiral', helix.spiral.toFixed(1));
-  const driftX = Math.sin(hp * Math.PI * 2) * 34;
-  const driftY = Math.cos(hp * Math.PI * 2) * 20 - hp * 40;
-  blueprintHelix.style.transform =
-    'rotate(' + helix.rot.toFixed(2) + 'deg) scale(' + helix.scale.toFixed(3) + ')' +
-    ' translate(' + driftX.toFixed(1) + 'px,' + driftY.toFixed(1) + 'px)';
-  // --- mouse tilt (lerped) ---
-  tilt.x += (tilt.tx - tilt.x) * 0.08;
-  tilt.y += (tilt.ty - tilt.y) * 0.08;
-  blueprintTilt.style.transform =
-    'rotateY(' + (tilt.x * 13).toFixed(2) + 'deg) rotateX(' + (-tilt.y * 11).toFixed(2) + 'deg)';
-  // --- annotations stagger in ---
-  const annos = document.querySelectorAll('.anno');
-  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.28 + i * 0.14));
-  // --- helix particles ---
-  if (helixW > 0) drawHelixParticles(hp, now);
+  const fp = updateForge3D(hp, dt) || 0;
+  if (dustW > 0) drawDust(now);
+  drawEmbers(now, fp);
   // --- hero text exit (progress > 80%) ---
   const chars = document.querySelectorAll('.hero-char');
   const discoverBtn = document.getElementById('discoverBtn');
@@ -955,24 +1171,24 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     sizeFooterSpacer();
-    sizeHelixCanvas();
+    sizeForge();
     buildScrollFX();
   }, 200);
 });
 
 /* ---------------- INIT (on fonts ready — don't wait for video) ---------------- */
 applyI18n();
-sizeHelixCanvas();
+sizeForge();
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => {
     buildScrollFX();
-    sizeHelixCanvas();
+    sizeForge();
     requestAnimationFrame(scrubTick);
   });
 } else {
   window.addEventListener('DOMContentLoaded', () => {
     buildScrollFX();
-    sizeHelixCanvas();
+    sizeForge();
     requestAnimationFrame(scrubTick);
   });
 }
