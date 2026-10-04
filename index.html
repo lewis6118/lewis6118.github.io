@@ -849,39 +849,84 @@ function initForge3D() {
   forgeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   const scene = new THREE.Scene();
   forgeCamera = new THREE.PerspectiveCamera(34, 1, 1, 4000);
-  forgeCamera.position.set(0, 30, 660);
+  forgeCamera.position.set(0, 0, 640);
   forgeCamera.lookAt(0, 0, 0);
 
-  scene.add(new THREE.HemisphereLight(0x9aa4bd, 0x04060b, 0.5));
-  const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(240, 280, 460); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xc22030, 0.9); rim.position.set(-280, -60, -320); scene.add(rim);
-  const fill = new THREE.DirectionalLight(0x54648c, 0.45); fill.position.set(-200, 180, 320); scene.add(fill);
+  // raking light reveals the relief depth like a metal nameplate
+  scene.add(new THREE.HemisphereLight(0x8a93a8, 0x04060b, 0.5));
+  const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(280, 220, 380); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xc22030, 0.6); rim.position.set(-260, -40, -280); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0x4a5a78, 0.35); fill.position.set(-160, 160, 300); scene.add(fill);
 
-  const steel = new THREE.MeshStandardMaterial({ color: 0x2b303a, metalness: 0.88, roughness: 0.34, side: THREE.DoubleSide });
-  const gripM = new THREE.MeshStandardMaterial({ color: 0x101216, metalness: 0.3, roughness: 0.58, side: THREE.DoubleSide });
-  const edgeM = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.20 });
-
-  shears = new THREE.Group();
+  shears = new THREE.Group(); // the relief plaque group
   scene.add(shears);
   initForge3D.scene = scene;
 
-  const defs = [
-    { build: () => extrudePart(bladeShape(), 7, steel, 1.1, edgeM), ex: { x: -26, y: 10, z: 150, rz: 0.10 }, az: 4 },
-    { build: () => extrudePart(bladeShape(), 7, steel, 1.1, edgeM), mirror: true, ex: { x: -14, y: -8, z: 78, rz: -0.10 }, az: -4 },
-    { build: () => extrudePart(gripShape(), 15, gripM, 2.2, edgeM), ex: { x: 16, y: 12, z: -78, rz: 0.08 }, az: 0 },
-    { build: () => extrudePart(gripShape(), 15, gripM, 2.2, edgeM), mirror: true, ex: { x: 28, y: -10, z: -150, rz: -0.08 }, az: 0 },
-    { build: () => buildScrew(edgeM), ex: { x: 0, y: 44, z: 238, rz: 0 }, az: 0 },
-    { build: () => buildSpring(edgeM), ex: { x: 30, y: -64, z: -238, rz: 0 }, az: 0 }
-  ];
-  defs.forEach(d => {
-    const g = d.build();
-    if (d.mirror) g.scale.y = -1;
-    g.position.set(d.ex.x, d.ex.y, d.ex.z);
-    g.rotation.z = d.ex.rz || 0;
-    g.userData = d;
-    shears.add(g);
-    partList.push(g);
-  });
+  // --- blueprint relief: the manuscript as a 3D nameplate, 6 fragments ---
+  const bpTex = new THREE.TextureLoader().load('/images/blueprint.webp');
+  bpTex.anisotropy = 4;
+  const COLS = 3, ROWS = 2;
+  const PW = 400, PH = 129; // 1800x580 aspect (~3.1:1), ~60% of viewport width
+  const TW = PW / COLS, TH = PH / ROWS;
+  const fragOrder = [3, 0, 4, 1, 5, 2]; // staggered fly-in sequence
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const geo = new THREE.PlaneGeometry(TW, TH, 44, 20);
+      const uv = geo.attributes.uv;
+      for (let i = 0; i < uv.count; i++) {
+        uv.setXY(i, (c + uv.getX(i)) / COLS, 1 - (r + 1 - uv.getY(i)) / ROWS);
+      }
+      const mat = new THREE.MeshStandardMaterial({
+        map: bpTex, displacementMap: bpTex,
+        displacementScale: 15, displacementBias: -5,
+        metalness: 0.62, roughness: 0.42,
+        side: THREE.DoubleSide
+      });
+      const tile = new THREE.Group();
+      tile.add(new THREE.Mesh(geo, mat));
+      // thin dark backing so fragments read as solid shards
+      const back = new THREE.Mesh(
+        new THREE.BoxGeometry(TW - 1.5, TH - 1.5, 7),
+        new THREE.MeshStandardMaterial({ color: 0x0c0e13, metalness: 0.7, roughness: 0.5 })
+      );
+      back.position.z = -4.5;
+      tile.add(back);
+      const ax = (c - 1) * TW, ay = (0.5 - r) * TH;
+      const idx = r * COLS + c;
+      const seq = fragOrder.indexOf(idx);
+      // scattered start: flung outward in 3D
+      const ang = (idx / 6) * Math.PI * 2 + 0.4;
+      const ex = Math.cos(ang) * (300 + seq * 45);
+      const ey = Math.sin(ang) * (190 + seq * 30) + (r === 0 ? 60 : -60);
+      const ez = 170 + seq * 68;
+      tile.userData = { ax, ay, az: 0, ex, ey, ez, seq,
+        erx: (seq - 2.5) * 0.55, ery: (seq - 2.5) * 0.7, erz: (seq - 2.5) * 0.22 };
+      tile.position.set(ex, ey, ez);
+      tile.rotation.set(tile.userData.erx, tile.userData.ery, tile.userData.erz);
+      shears.add(tile);
+      partList.push(tile);
+    }
+  }
+
+  // --- forging hammer: descends from above, gently touches the plaque ---
+  const hammer = new THREE.Group();
+  const steelM = new THREE.MeshStandardMaterial({ color: 0x3a3f47, metalness: 0.9, roughness: 0.32 });
+  const woodM = new THREE.MeshStandardMaterial({ color: 0x2a1d12, metalness: 0.1, roughness: 0.7 });
+  const head = new THREE.Mesh(new THREE.BoxGeometry(64, 44, 44), steelM);
+  const faceA = new THREE.Mesh(new THREE.CylinderGeometry(23, 23, 10, 24), steelM);
+  faceA.rotation.z = Math.PI / 2; faceA.position.x = 37;
+  const faceB = faceA.clone(); faceB.position.x = -37;
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(7, 9, 210, 16), woodM);
+  handle.position.y = 125;
+  const collar = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 14, 16), steelM);
+  collar.position.y = 28;
+  hammer.add(head, faceA, faceB, handle, collar);
+  hammer.rotation.z = 0.10; // slight natural tilt
+  hammer.position.set(30, 520, 60); // starts above the frame
+  hammer.visible = false;
+  scene.add(hammer);
+  initForge3D.hammer = hammer;
+
   fitShears();
 }
 try { initForge3D(); webglOK = true; } catch (err) { webglOK = false; }
@@ -953,31 +998,48 @@ let forgeT = 0, autoRotY = 0;
 function updateForge3D(hp, dt) {
   if (!webglOK) return;
   forgeT += dt;
-  const asmP = sstep(0.10, 0.52, hp);
-  partList.forEach((g, i) => {
+  // fragments fly in and assemble, staggered by seq
+  const asmP = sstep(0.10, 0.48, hp);
+  partList.forEach(g => {
     const d = g.userData;
-    const local = clamp01((asmP - i * 0.085) / (1 - 5 * 0.085));
+    const local = clamp01((asmP - d.seq * 0.09) / (1 - 5 * 0.09));
     const e = easeIO(local);
-    g.position.set(lerp(d.ex.x, 0, e), lerp(d.ex.y, 0, e), lerp(d.ex.z, d.az, e));
-    g.rotation.z = lerp(d.ex.rz || 0, 0, e);
+    g.position.set(lerp(d.ex, d.ax, e), lerp(d.ey, d.ay, e), lerp(d.ez, d.az, e));
+    g.rotation.set(lerp(d.erx, 0, e), lerp(d.ery, 0, e), lerp(d.erz, 0, e));
   });
-  autoRotY += dt * (0.22 * (1 - asmP) + 0.10);
+  // showcase: gentle auto-rotation + user drag
+  const showcase = sstep(0.46, 0.56, hp) * (1 - sstep(0.66, 0.74, hp));
+  autoRotY += dt * (0.30 * (1 - asmP) + 0.12) * (0.25 + 0.75 * showcase + 0.25 * (1 - showcase));
   shears.rotation.y = autoRotY + userRotY;
-  shears.rotation.x = userRotX + Math.sin(forgeT * 0.6) * 0.035;
-  shears.position.y = Math.sin(forgeT * 0.9) * 7;
-  forgeCamera.position.z = lerp(690, 600, asmP);
-  forgeCamera.position.y = lerp(60, 26, asmP);
+  shears.rotation.x = userRotX + Math.sin(forgeT * 0.6) * 0.03;
+  shears.position.y = Math.sin(forgeT * 0.9) * 6;
+  // hammer: slowly descends from above, gently touches the plaque
+  const hammer = initForge3D.hammer;
+  if (hammer) {
+    const hp2 = sstep(0.62, 0.86, hp); // descent progress
+    hammer.visible = hp > 0.60 && hp < 0.94;
+    const hy = lerp(520, 74, easeIO(hp2)); // 74 = head lightly touches plaque top
+    hammer.position.y = hy + Math.sin(forgeT * 1.1) * 2.5 * (1 - hp2);
+    hammer.position.x = lerp(60, 30, hp2);
+    hammer.rotation.z = lerp(0.22, 0.10, hp2);
+    // on touch: tiny settle bounce + fade out as craftsman fades in
+    const touch = sstep(0.86, 0.90, hp);
+    hammer.position.y = lerp(hammer.position.y, 68, touch);
+    hammer.visible = hp < 0.93;
+  }
+  forgeCamera.position.z = lerp(680, 610, asmP);
+  forgeCamera.position.y = lerp(30, 8, asmP);
   forgeCamera.lookAt(0, 0, 0);
   forgeRenderer.render(initForge3D.scene, forgeCamera);
-  // finale crossfade
-  const fp = sstep(0.74, 0.93, hp);
+  // finale crossfade (after hammer touch)
+  const fp = sstep(0.865, 0.96, hp);
   forgeFinale.style.opacity = fp.toFixed(3);
   forgeCanvas.style.opacity = Math.max(0, 1 - fp * 1.35).toFixed(3);
   forgeImg.style.transform = 'scale(' + (1.06 + fp * 0.14).toFixed(3) + ')';
-  // annotations during showcase
+  // annotations during showcase (before hammer)
   const annos = document.querySelectorAll('.anno');
-  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.54 + i * 0.05 && hp < 0.78));
-  phaseHint.classList.toggle('on', hp > 0.50 && hp < 0.74);
+  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.50 + i * 0.04 && hp < 0.70));
+  phaseHint.classList.toggle('on', hp > 0.48 && hp < 0.66);
   return fp;
 }
 
