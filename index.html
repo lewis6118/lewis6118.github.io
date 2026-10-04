@@ -1,1260 +1,300 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>兴芝林 XINGZHILIN · 专业厨房剪刀制造商</title>
-<meta name="description" content="兴芝林刀剪厂——十三年专注厨房剪刀制造，远销东南亚、印度、迪拜。匠心之作，不妥协。" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>兴芝林 XINGZHILIN — 精工利刃</title>
 <style>
-/* ============ RESET & TOKENS ============ */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --color-bg: #ffffff;
-  --color-primary-text: #000000;
-  --color-demoted-text: #000000;
-  --color-divider: #000000;
-  --color-accent: #A3111E;
-  --font-stack: 'Inter Tight', 'Noto Sans SC', 'Inter', Arial, sans-serif;
-  --font-display: 'Instrument Serif', 'Noto Serif SC', Georgia, serif;
+  --black: #000000;
+  --white: #ffffff;
+  --red: #A3111E;
+  --gray-100: #f7f7f5;
+  --gray-800: #2e2e2e;
+  --font-display: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+  --font-body: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
 }
-html { scroll-behavior: auto; }
-html, body { background: var(--color-bg); }
-body {
-  font-family: var(--font-stack);
-  color: var(--color-primary-text);
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-img, video { display: block; max-width: 100%; }
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; background: none; border: none; cursor: pointer; color: inherit; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--white); color: var(--black); -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
 
-/* ============ FIXED HEADER ============ */
-.site-header {
-  position: fixed; top: 32px; left: 32px; right: 32px; height: 30px; z-index: 100;
+/* ---------- nav ---------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px; transition: background .4s, backdrop-filter .4s;
 }
-.header-logo img { height: 34px; width: auto; display: block; }
-.header-nav { display: flex; align-items: center; }
-.header-nav .about-link {
-  font-size: 15px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: 0.04em; color: var(--color-accent);
-  margin-right: 194px; transition: opacity 0.25s ease;
-}
-.lang-toggle {
-  font-size: 15px; font-weight: 500; color: var(--color-accent);
-  margin-right: 40px; letter-spacing: 0.04em; transition: opacity 0.25s ease;
-  display: flex; align-items: center; gap: 6px;
-}
-.lang-toggle .lang-sep { opacity: 0.4; }
-.lang-toggle .lang-opt { opacity: 0.45; }
-.lang-toggle .lang-opt.active { opacity: 1; }
-.cart-menu-group { display: flex; align-items: center; gap: 50px; }
-.hamburger { display: flex; flex-direction: column; gap: 5px; padding: 6px 0; transition: opacity 0.25s ease; }
-.hamburger span { display: block; width: 30px; height: 2.2px; background: var(--color-accent); }
-.bag-btn {
-  font-size: 15px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: 0.04em; color: var(--color-accent); transition: opacity 0.25s ease;
-}
-.about-link:hover, .bag-btn:hover, .hamburger:hover, .lang-toggle:hover { opacity: 0.7; }
+.nav.scrolled { background: rgba(255,255,255,.85); backdrop-filter: blur(12px); }
+.nav-logo img { height: 32px; }
+.nav-links { display: flex; gap: 36px; list-style: none; }
+.nav-links a { text-decoration: none; color: inherit; font-size: 14px; letter-spacing: .12em; }
+.nav.dark .nav-links a, .nav.dark .lang-btn { color: #fff; }
+.nav.scrolled.dark .nav-links a, .nav.scrolled.dark .lang-btn { color: #000; }
+.lang-btn { background: none; border: 1px solid currentColor; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: inherit; }
 
-/* Fullscreen menu overlay */
-.menu-overlay {
-  position: fixed; inset: 0; z-index: 200; background: #ffffff;
-  display: flex; flex-direction: column; justify-content: center; padding: 48px;
-  opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s;
-}
-.menu-overlay.open { opacity: 1; visibility: visible; }
-.menu-overlay nav { display: flex; flex-direction: column; gap: 8px; }
-.menu-overlay nav a {
-  font-family: var(--font-display); font-size: clamp(40px, 7vw, 84px);
-  line-height: 1.1; color: #000; transition: color 0.25s ease, transform 0.35s ease;
-}
-.menu-overlay nav a:hover { color: var(--color-accent); transform: translateX(12px); }
-.menu-close {
-  position: absolute; top: 32px; right: 32px; font-size: 15px; font-weight: 500;
-  color: var(--color-accent); letter-spacing: 0.04em;
-}
-
-/* ============ PAGE SCAFFOLD (footer reveal) ============ */
-.page-content { position: relative; z-index: 10; background: #ffffff; }
-.footer-spacer { background: transparent; pointer-events: none; }
-
-/* ============ HERO (scroll-driven video) ============ */
-.hero-section { height: 500vh; background: #000000; position: relative; z-index: 10; }
-.hero-sticky {
-  position: sticky; top: 0; height: 100vh; background: #000000;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 48px; overflow: hidden;
-}
-.hero-video {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; z-index: 1;
-}
-.video-overlay { display: none; }
-.hero-content { position: relative; z-index: 3; max-width: 700px; }
-.hero-title {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(36px, 6vw, 72px); line-height: 1.05; letter-spacing: -1px;
-  color: #ffffff;
-}
-.hero-title-line { display: block; overflow: hidden; }
-.hero-title-line-inner { display: inline-block; }
-.hero-char { display: inline-block; will-change: opacity, transform, filter; }
-.hero-cta { margin-top: 10px; }
+/* ---------- hero ---------- */
+.hero { position: relative; height: 100vh; min-height: 640px; overflow: hidden; background: var(--black); }
+.hero-bg { position: absolute; inset: 0; width: 100%; height: 120%; object-fit: cover; opacity: .75; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.15) 55%, rgba(0,0,0,.25)); }
+.hero-content { position: absolute; left: 48px; bottom: 96px; z-index: 2; color: #fff; }
+.hero-kicker { font-size: 13px; letter-spacing: .35em; opacity: .8; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+.hero-kicker::before { content: ""; width: 36px; height: 1px; background: var(--red); display: inline-block; }
+.hero-title { font-family: var(--font-display); font-size: clamp(48px, 8vw, 110px); line-height: 1.08; font-weight: 400; }
+.hero-title .char { display: inline-block; opacity: 0; transform: translateY(40px); filter: blur(8px); }
+.hero-sub { margin-top: 20px; font-size: 16px; letter-spacing: .2em; opacity: .75; }
+.hero-cta { margin-top: 36px; }
 .btn-capsule {
-  display: inline-flex; align-items: center; gap: 14px;
-  background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 100px;
-  padding: 4px 4px 4px 18px; min-height: 38px;
-  font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
-  color: #000; transition: background 0.3s ease, color 0.3s ease;
+  display: inline-flex; align-items: center; gap: 14px; text-decoration: none;
+  background: #fff; border-radius: 100px; padding: 6px 6px 6px 24px;
+  color: #000; font-size: 14px; letter-spacing: .1em; transition: background .3s, color .3s;
 }
-.btn-capsule .btn-circle {
-  position: relative; width: 28px; height: 28px; border-radius: 50%;
-  background: #2e2e2e; flex-shrink: 0; transition: background 0.3s ease;
-}
-.btn-capsule .btn-circle::before,
-.btn-capsule .btn-circle::after {
-  content: ''; position: absolute; top: 50%; left: 50%; background: #ffffff;
-  transform: translate(-50%, -50%); transition: background 0.3s ease;
-}
-.btn-capsule .btn-circle::before { width: 10px; height: 1.5px; }
-.btn-capsule .btn-circle::after { width: 1.5px; height: 10px; }
-.btn-capsule:hover { background: #000000; color: #ffffff; }
-.btn-capsule:hover .btn-circle { background: #ffffff; }
-.btn-capsule:hover .btn-circle::before,
-.btn-capsule:hover .btn-circle::after { background: #000000; }
-.hero-scroll-hint {
-  position: absolute; right: 48px; bottom: 48px; z-index: 3;
-  color: rgba(255,255,255,0.55); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 10px;
-}
-.hero-scroll-hint::after {
-  content: ''; width: 1px; height: 44px; background: rgba(255,255,255,0.55);
-  animation: hintDrop 1.8s ease-in-out infinite;
-}
-@keyframes hintDrop { 0% { transform: scaleY(0); transform-origin: top; } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+.btn-capsule:hover { background: var(--red); color: #fff; }
+.btn-capsule .circle { width: 34px; height: 34px; border-radius: 50%; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background .3s; }
+.btn-capsule:hover .circle { background: #fff; color: var(--red); }
+.hero-scroll-hint { position: absolute; right: 48px; bottom: 96px; color: #fff; font-size: 12px; letter-spacing: .3em; opacity: .6; writing-mode: vertical-rl; z-index: 2; }
 
-/* ============ HERO FORGE 3D ============ */
-.hero-sticky { background: #060a14; }
-.forge-grid {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px);
-  background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 20%, transparent 75%);
-  mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 20%, transparent 75%);
-}
-.dust-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
-.forge3d-canvas {
-  position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%;
-  touch-action: pan-y; cursor: grab;
-}
-.forge-finale {
-  position: absolute; inset: 0; z-index: 3; opacity: 0; pointer-events: none;
-  overflow: hidden; background: #000;
-}
-.forge-img {
-  position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover;
-  will-change: transform;
-}
-.forge-shade {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 42%, transparent 30%, rgba(0,0,0,0.55) 100%),
-    linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 42%, rgba(0,0,0,0.35) 100%);
-}
-.ember-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.forge-caption {
-  position: absolute; left: 0; right: 0; bottom: 9%; text-align: center;
-  color: #fff; pointer-events: none;
-}
-.forge-caption-kicker {
-  font-size: 13px; letter-spacing: 0.5em; text-indent: 0.5em;
-  color: var(--color-accent); margin-bottom: 14px; font-weight: 500;
-}
-.forge-caption h2 {
-  font-size: clamp(38px, 6vw, 72px); font-weight: 600; letter-spacing: 0.12em;
-  text-indent: 0.12em; margin: 0 0 12px;
-}
-.forge-caption p {
-  font-size: 14px; letter-spacing: 0.3em; text-indent: 0.3em;
-  color: rgba(255,255,255,0.65); margin: 0;
-}
-.anno-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.anno {
-  position: absolute; display: flex; align-items: center; gap: 10px;
-  font-size: 13px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(255,255,255,0.9); white-space: nowrap;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.anno i {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  background: var(--color-accent); box-shadow: 0 0 14px var(--color-accent);
-}
-.anno b { font-weight: 500; }
-.anno.on { opacity: 1; transform: translateY(0); }
-.anno[data-anno="0"] { top: 32%; left: 9%; }
-.anno[data-anno="1"] { top: 22%; left: 63%; }
-.anno[data-anno="2"] { top: 72%; left: 64%; }
-.phase-hint {
-  position: absolute; left: 0; right: 0; bottom: 26px; z-index: 5;
-  text-align: center; font-size: 12px; letter-spacing: 0.28em; text-indent: 0.28em;
-  color: rgba(255,255,255,0.5); pointer-events: none;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.phase-hint.on { opacity: 1; transform: translateY(0); }
-.phase-hint .dot {
-  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--color-accent); margin-right: 10px; vertical-align: 1px;
-  animation: hintPulse 1.6s ease-in-out infinite;
-}
-@keyframes hintPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+/* ---------- sections ---------- */
+.section { padding: 120px 48px; max-width: 1400px; margin: 0 auto; }
+.section-kicker { font-size: 13px; letter-spacing: .35em; color: var(--red); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+.section-kicker::before { content: ""; width: 36px; height: 1px; background: var(--red); }
+.section-title { font-family: var(--font-display); font-size: clamp(32px, 4vw, 56px); font-weight: 400; margin-bottom: 16px; }
+.section-desc { font-size: 16px; color: #555; max-width: 640px; line-height: 1.8; }
+.reveal { opacity: 0; transform: translateY(36px); }
 
-/* ============ PRODUCT CAROUSEL ============ */
-.awards-section {
-  height: 100vh; overflow: hidden; position: relative; z-index: 10;
-  background: #ffffff; border-top: 1px solid #000; border-bottom: 1px solid #000;
-}
-.awards-grid {
-  display: flex; flex-direction: row; width: max-content; height: 100%;
-  will-change: transform;
-}
+/* ---------- products ---------- */
+#products { background: var(--gray-100); }
+.product-track { display: flex; gap: 28px; margin-top: 56px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; }
 .product-card {
-  width: 33.333vw; height: 100%; flex-shrink: 0;
-  border-right: 1px solid #000; background: #ffffff;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: clamp(40px, 8vh, 80px) 48px; gap: clamp(24px, 4vh, 48px);
-  text-align: center;
+  flex: 0 0 320px; background: #fff; border-radius: 12px; overflow: hidden;
+  scroll-snap-align: start; transition: transform .35s, box-shadow .35s; cursor: pointer;
 }
-.product-card:last-child { border-right: none; }
-.product-img-wrap { height: 280px; display: flex; align-items: center; justify-content: center; max-width: 85%; }
-.product-img-wrap img { max-height: 100%; max-width: 100%; object-fit: contain; }
-.product-name { font-size: 18px; font-weight: 400; letter-spacing: -0.2px; }
-.product-name .en-sub { display: block; font-size: 13px; opacity: 0.55; margin-top: 6px; letter-spacing: 0.02em; }
-.product-price { font-size: 16px; font-weight: 500; opacity: 0.6; }
-.video-scaling-wrapper {
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 0%; height: 100%; overflow: hidden; z-index: 5;
-  will-change: width; pointer-events: none;
-}
-.video-scaling-wrapper.active { pointer-events: auto; }
-.reveal-video {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 100vw; height: 100vh; object-fit: cover;
-}
-.reveal-caption {
-  position: absolute; left: 48px; bottom: 48px; z-index: 6;
-  color: #fff; font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 54px); line-height: 1.1; letter-spacing: -0.5px;
-  opacity: 0; transition: opacity 0.6s ease; max-width: 640px;
-}
-.video-scaling-wrapper.active .reveal-caption { opacity: 1; }
+.product-card:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+.product-card .img-wrap { aspect-ratio: 1; overflow: hidden; background: #fff; }
+.product-card img { width: 100%; height: 100%; object-fit: contain; transition: transform .5s; }
+.product-card:hover img { transform: scale(1.05); }
+.product-card .info { padding: 24px; }
+.product-card .name-zh { font-size: 19px; font-weight: 600; }
+.product-card .name-en { font-size: 13px; color: #888; letter-spacing: .08em; margin-top: 6px; }
+.product-card .price { font-size: 17px; margin-top: 14px; font-weight: 600; }
+.product-card .price::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-right: 10px; }
 
-/* ============ STATS (two-column) ============ */
-.stats-section {
-  display: grid; grid-template-columns: 50% 50%;
-  border-bottom: 1px solid #000; background: #ffffff; position: relative; z-index: 10;
-}
-.stats-left {
-  position: sticky; top: 0; height: 100vh;
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 48px 96px 48px 48px;
-}
-.stats-heading {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(32px, 4vw, 42px); line-height: 1.15; letter-spacing: -0.5px;
-}
-.stats-copy { display: flex; flex-direction: column; gap: 32px; }
-.stats-copy p { font-size: 24px; font-weight: 400; line-height: 1.35; letter-spacing: -0.2px; }
-.stats-left .btn-capsule { align-self: flex-start; margin-top: 8px; }
-.stats-right { border-left: 1px solid #000; }
-.stat-card { padding: 48px; min-height: 45vh; border-bottom: 1px solid #000; display: flex; flex-direction: column; justify-content: center; }
-.stat-card:last-child { border-bottom: none; }
-.stomp-stack:first-child { display: none; }
-.heading-style-h1 {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(46px, 5.5vw, 70px); letter-spacing: -1.5px; line-height: 0.95;
-}
-.stat-char { display: inline-block; will-change: opacity, transform; }
-.detail-paragraph { font-size: 24px; padding-top: 42px; line-height: 1.35; max-width: 560px; }
-.detail-word { display: inline-block; }
-.card-subtext { font-size: 13px; margin-top: 12px; opacity: 0.6; letter-spacing: 0.04em; }
+/* ---------- about ---------- */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 56px; align-items: center; }
+.about-img { border-radius: 12px; overflow: hidden; }
+.about-img img { width: 100%; height: 480px; object-fit: cover; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+.stat .num { font-family: var(--font-display); font-size: 48px; color: var(--black); }
+.stat .num em { font-style: normal; color: var(--red); font-size: 32px; }
+.stat .label { font-size: 14px; color: #666; margin-top: 8px; letter-spacing: .1em; }
 
-/* ============ NEWS ============ */
-.news-section { background: #ffffff; border-bottom: 1px solid #000; padding: 96px 48px; position: relative; z-index: 10; }
-.news-heading {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.5px; margin-bottom: 48px;
-}
-.news-list { border-top: 1px solid #000; }
-.news-item {
-  display: grid; grid-template-columns: 140px 1fr auto; gap: 32px; align-items: baseline;
-  padding: 32px 0; border-bottom: 1px solid #000; transition: background 0.25s ease;
-}
-.news-item:hover { background: #fafafa; }
-.news-date { font-size: 14px; font-weight: 500; letter-spacing: 0.06em; opacity: 0.6; }
-.news-title { font-size: 22px; font-weight: 500; letter-spacing: -0.2px; }
-.news-excerpt { grid-column: 2; font-size: 15px; line-height: 1.6; opacity: 0.7; max-width: 720px; margin-top: 8px; }
-.news-arrow { font-size: 22px; transition: transform 0.3s ease; }
-.news-item:hover .news-arrow { transform: translateX(8px); color: var(--color-accent); }
+/* ---------- news ---------- */
+.news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 56px; }
+.news-card { text-decoration: none; color: inherit; }
+.news-card .thumb { aspect-ratio: 16/10; background: var(--gray-100); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+.news-card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.news-card:hover .thumb img { transform: scale(1.04); }
+.news-card .date { font-size: 13px; color: var(--red); letter-spacing: .15em; }
+.news-card h3 { font-size: 19px; margin-top: 10px; font-weight: 600; line-height: 1.5; }
+.news-card p { font-size: 14px; color: #666; margin-top: 10px; line-height: 1.7; }
 
-/* ============ FOOTER (fixed reveal) ============ */
-.site-footer {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1;
-  background: #ffffff; display: grid; grid-template-columns: 1.2fr 1fr 1.5fr;
-  gap: 48px; padding: 80px 48px;
-}
-.footer-col h3, .footer-col .footer-link-head {
-  font-size: 18px; font-weight: 400; letter-spacing: -0.2px; margin-bottom: 24px; display: block;
-}
-.footer-col a { transition: opacity 0.25s ease; }
-.footer-col a:hover { opacity: 0.6; }
-.footer-credits { font-size: 18px; line-height: 1.35; }
-.footer-credits .blank-line { height: 1.35em; }
-.footer-links { display: flex; flex-direction: column; gap: 12px; font-size: 18px; font-weight: 400; }
-.footer-contact { margin-top: 24px; font-size: 15px; line-height: 1.7; opacity: 0.85; }
-.footer-contact strong { font-weight: 500; }
-.newsletter-desc { font-size: 18px; line-height: 1.35; max-width: 380px; margin-bottom: 24px; }
-.newsletter-form {
-  display: flex; align-items: center; background: #f7f7f5; border-radius: 100px;
-  padding: 6px 6px 6px 24px; max-width: 440px; transition: box-shadow 0.25s ease;
-}
-.newsletter-form:focus-within { box-shadow: 0 0 0 1px #000000; }
-.newsletter-form input {
-  flex: 1; border: none; outline: none; background: transparent;
-  font-family: inherit; font-size: 14px; color: #000; min-width: 0;
-}
-.newsletter-form input::placeholder { color: rgba(0,0,0,0.45); }
+/* ---------- contact ---------- */
+#contact { background: var(--black); color: #fff; }
+#contact .section-title { color: #fff; }
+#contact .section-desc { color: #aaa; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; }
+.contact-item { border-top: 1px solid #333; padding: 28px 0; }
+.contact-item .label { font-size: 13px; letter-spacing: .25em; color: #888; margin-bottom: 12px; }
+.contact-item .value { font-size: 22px; font-weight: 500; }
 
-/* ============ RESPONSIVE ============ */
-@media (max-width: 1199px) and (min-width: 769px) {
-  .site-header { top: 24px; left: 24px; right: 24px; }
-  .header-nav .about-link { margin-right: 100px; }
-  .cart-menu-group { gap: 32px; }
-  .stats-left { padding: 40px 32px; }
-  .hero-title { font-size: 48px; }
-  .heading-style-h1 { font-size: 44px !important; }
-  .stats-heading { font-size: 30px; }
-  .stats-copy p, .detail-paragraph { font-size: 18px; }
-  .product-card { width: 50vw; }
-  .site-footer { grid-template-columns: 1fr 1fr; }
-  .site-footer .footer-col:last-child { grid-column: span 2; }
-}
-@media (max-width: 768px) {
-  .site-header { top: 16px; left: 16px; right: 16px; }
-  .header-nav .about-link { margin-right: 24px; font-size: 13px; }
-  .lang-toggle { margin-right: 20px; font-size: 13px; }
-  .cart-menu-group { gap: 20px; }
-  .bag-btn { font-size: 13px; }
-  .hamburger span { width: 26px; }
-  .header-logo img { height: 28px; }
-  .hero-sticky { padding: 24px 16px; }
-  .hero-title { font-size: 38px; }
+/* ---------- footer ---------- */
+.footer { background: #0a0a0a; color: #666; padding: 60px 48px 40px; }
+.footer-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; }
+.footer-brand { font-family: var(--font-display); font-size: 28px; color: #fff; letter-spacing: .15em; }
+.footer-note { font-size: 13px; margin-top: 12px; }
+.footer-copy { font-size: 12px; }
+
+@media (max-width: 900px) {
+  .nav { padding: 16px 20px; }
+  .nav-links { display: none; }
+  .section { padding: 80px 20px; }
+  .hero-content { left: 20px; bottom: 64px; }
   .hero-scroll-hint { display: none; }
-  .stats-section { grid-template-columns: 1fr; }
-  .stats-left { position: static; height: auto; padding: 64px 24px; gap: 40px; }
-  .stats-right { border-left: none; border-top: 1px solid #000; }
-  .stats-copy p { font-size: 15px; }
-  .heading-style-h1 { font-size: 34px !important; }
-  .detail-paragraph { font-size: 15px; padding-top: 24px; }
-  .stat-card { padding: 40px 24px; min-height: 0; }
-  .product-card { width: 85vw; padding: 40px 24px; }
-  .product-img-wrap { height: 220px; }
-  .news-section { padding: 64px 24px; }
-  .news-item { grid-template-columns: 1fr auto; gap: 12px; }
-  .news-date { grid-column: 1; }
-  .news-excerpt { grid-column: 1; }
-  .site-footer { grid-template-columns: 1fr; padding: 48px 16px; gap: 40px; }
-  .btn-capsule { min-height: 44px; }
-  .newsletter-form { max-width: 100%; }
+  .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+  .news-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .footer-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ================= FIXED HEADER ================= -->
-<header class="site-header">
-  <a class="header-logo" href="#" aria-label="兴芝林 XINGZHILIN">
-    <img src="/images/xingzhilin-images/logo-header.png" alt="兴芝林 XINGZHILIN" />
-  </a>
-  <nav class="header-nav">
-    <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language">
-      <span class="lang-opt" data-lang="zh">中</span><span class="lang-sep">/</span><span class="lang-opt" data-lang="en">EN</span>
-    </button>
-    <a class="about-link" href="#about" data-i18n="nav_about">关于我们</a>
-    <div class="cart-menu-group">
-      <button class="hamburger" id="menuBtn" aria-label="菜单">
-        <span></span><span></span>
-      </button>
-      <button class="bag-btn" id="bagBtn" data-i18n="nav_bag">[ 购物袋 ]</button>
+<nav class="nav dark" id="nav">
+  <div class="nav-logo"><img src="/images/xingzhilin-images/logo-header.png" alt="兴芝林"></div>
+  <ul class="nav-links">
+    <li><a href="#products" data-zh="产品" data-en="Products">产品</a></li>
+    <li><a href="#about" data-zh="品牌" data-en="About">品牌</a></li>
+    <li><a href="#news" data-zh="新闻" data-en="News">新闻</a></li>
+    <li><a href="#contact" data-zh="联系" data-en="Contact">联系</a></li>
+  </ul>
+  <button class="lang-btn" id="langBtn">EN</button>
+</nav>
+
+<header class="hero" id="hero">
+  <img class="hero-bg" id="heroBg" src="/images/xingzhilin-images/forge-craftsman.jpg" alt="工匠锻造">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-kicker" data-zh="兴芝林 · 匠心锻造" data-en="XINGZHILIN · FORGED WITH CARE">兴芝林 · 匠心锻造</div>
+    <h1 class="hero-title" id="heroTitle">精工利刃</h1>
+    <div class="hero-sub" data-zh="千锤百炼，方成利刃" data-en="FROM FIRE, INTO EDGE">千锤百炼，方成利刃</div>
+    <div class="hero-cta">
+      <a class="btn-capsule" href="#products">
+        <span data-zh="探索产品" data-en="Explore">探索产品</span>
+        <span class="circle">→</span>
+      </a>
     </div>
-  </nav>
+  </div>
+  <div class="hero-scroll-hint" data-zh="向下滚动" data-en="SCROLL">向下滚动</div>
 </header>
 
-<!-- Fullscreen menu -->
-<div class="menu-overlay" id="menuOverlay">
-  <button class="menu-close" id="menuClose" data-i18n="menu_close">关闭 ×</button>
-  <nav>
-    <a href="#products" data-i18n="menu_products">产品系列</a>
-    <a href="#about" data-i18n="menu_about">关于兴芝林</a>
-    <a href="#news" data-i18n="menu_news">新闻动态</a>
-    <a href="#contact" data-i18n="menu_contact">联系我们</a>
-  </nav>
-</div>
+<section class="section" id="products">
+  <div class="section-kicker" data-zh="产品系列" data-en="COLLECTION">产品系列</div>
+  <h2 class="section-title reveal" data-zh="匠心之作" data-en="Our Craft">匠心之作</h2>
+  <p class="section-desc reveal" data-zh="每一把剪刀，都经过手工研磨与严格检验。" data-en="Every pair is hand-ground and strictly inspected.">每一把剪刀，都经过手工研磨与严格检验。</p>
+  <div class="product-track" id="productTrack"></div>
+</section>
 
-<main class="page-content">
-
-  <!-- ================= HERO : forge 3D exploded > assemble > craftsman ================= -->
-  <section class="hero-section" id="hero">
-    <div class="hero-sticky" id="heroSticky">
-      <div class="forge-grid"></div>
-      <canvas class="dust-canvas" id="dustCanvas"></canvas>
-      <canvas class="forge3d-canvas" id="forge3dCanvas"></canvas>
-      <div class="forge-finale" id="forgeFinale">
-        <img class="forge-img" id="forgeImg" src="/images/xingzhilin-images/forge-craftsman.jpg" alt="工匠锻造" />
-        <div class="forge-shade"></div>
-        <canvas class="ember-canvas" id="emberCanvas"></canvas>
-        <div class="forge-caption">
-          <div class="forge-caption-kicker" data-i18n="forge_kicker">匠心</div>
-          <h2 data-i18n="forge_title">千锤百炼</h2>
-          <p data-i18n="forge_sub">烈火淬炼，方成利刃</p>
-        </div>
+<section class="section" id="about">
+  <div class="section-kicker" data-zh="品牌故事" data-en="OUR STORY">品牌故事</div>
+  <h2 class="section-title reveal" data-zh="十三年，只做一把好剪刀" data-en="13 YEARS, ONE PROMISE">十三年，只做一把好剪刀</h2>
+  <div class="about-grid">
+    <div class="about-img reveal"><img src="/images/xingzhilin-images/forge-craftsman.jpg" alt="工匠"></div>
+    <div>
+      <p class="section-desc reveal" data-zh="兴芝林创立于阳江，专注刀剪制造十三年。从选材、锻造到研磨，每一道工序都由经验丰富的工匠完成。产品远销东南亚、印度、迪拜，深受海外客户信赖。" data-en="Founded in Yangjiang, XINGZHILIN has focused on scissors for 13 years. From material selection to forging and grinding, every step is done by seasoned craftsmen. Exported to Southeast Asia, India and Dubai.">兴芝林创立于阳江，专注刀剪制造十三年。从选材、锻造到研磨，每一道工序都由经验丰富的工匠完成。产品远销东南亚、印度、迪拜，深受海外客户信赖。</p>
+      <div class="stats">
+        <div class="stat reveal"><div class="num">13<em>+</em></div><div class="label" data-zh="年专注制造" data-en="YEARS">年专注制造</div></div>
+        <div class="stat reveal"><div class="num">50<em>+</em></div><div class="label" data-zh="名工匠" data-en="CRAFTSMEN">名工匠</div></div>
+        <div class="stat reveal"><div class="num">20<em>+</em></div><div class="label" data-zh="出口国家" data-en="COUNTRIES">出口国家</div></div>
       </div>
-      <div class="anno-layer" id="annoLayer">
-        <span class="anno" data-anno="0"><i></i><b data-i18n="anno1">手工研磨刃口</b></span>
-        <span class="anno" data-anno="1"><i></i><b>230 mm</b></span>
-        <span class="anno" data-anno="2"><i></i><b data-i18n="anno2">兴芝林设计手稿</b></span>
-      </div>
-      <div class="hero-content">
-        <h1 class="hero-title" aria-label="精工利刃">
-          <span class="hero-title-line"><span class="hero-title-line-inner" data-title-line="0">精工</span></span>
-          <span class="hero-title-line"><span class="hero-title-line-inner" data-title-line="1">利刃</span></span>
-        </h1>
-        <div class="hero-cta">
-          <button class="btn-capsule" id="discoverBtn">
-            <span data-i18n="hero_discover">探索</span><span class="btn-circle"></span>
-          </button>
-        </div>
-      </div>
-      <div class="hero-scroll-hint" data-i18n="hero_scroll">向下滚动</div>
-      <div class="phase-hint" id="phaseHint"><span class="dot"></span><span data-i18n="drag_hint">拖拽旋转 · 滚动组装</span></div>
-    </div>
-  </section>
-
-  <!-- ================= PRODUCT CAROUSEL ================= -->
-  <section class="awards-section" id="products">
-    <div class="awards-grid" id="awardsGrid">
-      <div class="product-card">
-        <div class="product-img-wrap"><img src="/images/xingzhilin-images/product-1.webp" alt="曜石烤肉剪" loading="lazy" /></div>
-        <div><div class="product-name"><span data-i18n="p1_name">曜石烤肉剪</span><span class="en-sub">Obsidian BBQ Shears</span></div></div>
-        <div class="product-price">¥168</div>
-      </div>
-      <div class="product-card">
-        <div class="product-img-wrap"><img src="/images/xingzhilin-images/product-2.webp" alt="臻黑烤肉剪" loading="lazy" /></div>
-        <div><div class="product-name"><span data-i18n="p2_name">臻黑烤肉剪</span><span class="en-sub">Onyx BBQ Shears</span></div></div>
-        <div class="product-price">¥158</div>
-      </div>
-      <div class="product-card">
-        <div class="product-img-wrap"><img src="/images/xingzhilin-images/product-3.webp" alt="磁吸冰箱剪" loading="lazy" /></div>
-        <div><div class="product-name"><span data-i18n="p3_name">磁吸冰箱剪</span><span class="en-sub">Magnetic Fridge Scissors</span></div></div>
-        <div class="product-price">¥98</div>
-      </div>
-      <div class="product-card">
-        <div class="product-img-wrap"><img src="/images/xingzhilin-images/product-4.webp" alt="青竹家用剪" loading="lazy" /></div>
-        <div><div class="product-name"><span data-i18n="p4_name">青竹家用剪</span><span class="en-sub">Bamboo Green Household Shears</span></div></div>
-        <div class="product-price">¥88</div>
-      </div>
-      <div class="product-card">
-        <div class="product-img-wrap"><img src="/images/xingzhilin-images/product-5.webp" alt="墨灰磁吸剪" loading="lazy" /></div>
-        <div><div class="product-name"><span data-i18n="p5_name">墨灰磁吸剪</span><span class="en-sub">Graphite Magnetic Scissors</span></div></div>
-        <div class="product-price">¥108</div>
-      </div>
-    </div>
-    <div class="video-scaling-wrapper" id="videoScalingWrapper">
-      <video class="reveal-video" id="revealVideo" muted playsinline preload="auto"
-             poster="/images/xingzhilin-images/product-5.webp" disablepictureinpicture>
-        <source src="/videos/craft-reveal.mp4" type="video/mp4" />
-      </video>
-      <div class="reveal-caption" data-i18n="reveal_caption">一剪一世界，锋利即态度。</div>
-    </div>
-  </section>
-
-  <!-- ================= STATS ================= -->
-  <section class="stats-section" id="about">
-    <div class="stats-left">
-      <div>
-        <h2 class="stats-heading" data-fade-slide-in data-i18n="stats_heading">匠心之作，不妥协</h2>
-      </div>
-      <div class="stats-copy">
-        <p data-fade-slide-in data-i18n="stats_p1">每一把剪刀都由一双手完成——没有冰冷的流水线，没有敷衍的组装。先选材，再成型，顺应钢材的本性。</p>
-        <p data-fade-slide-in data-i18n="stats_p2">我们选用优质不锈钢，刀刃手工开锋、反复研磨。重量趁手，刃口锋利，每一处细节都不将就。</p>
-        <p data-fade-slide-in data-i18n="stats_p3">兴芝林为懂剪刀的人而存在。不止是工具，更是信赖。一把一剪，经久耐用。</p>
-        <button class="btn-capsule" id="viewCollectionBtn" data-fade-slide-in>
-          <span data-i18n="stats_cta">查看产品</span><span class="btn-circle"></span>
-        </button>
-      </div>
-    </div>
-    <div class="stats-right">
-      <div class="stat-card">
-        <div class="stomp-wrapper">
-          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">13年</h1></div>
-          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="0">13年</h1></div>
-        </div>
-        <p class="detail-paragraph" data-detail="0" data-i18n="stat_d1">十三年专注刀剪制造</p>
-      </div>
-      <div class="stat-card">
-        <div class="stomp-wrapper">
-          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">50+</h1></div>
-          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="1">50+ 工匠</h1></div>
-        </div>
-        <p class="detail-paragraph" data-detail="1" data-i18n="stat_d2">五十余名熟练工匠，每一把剪刀都经过手工精磨</p>
-      </div>
-      <div class="stat-card">
-        <div class="stomp-wrapper">
-          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">20+</h1></div>
-          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="2">20+ 市场</h1></div>
-        </div>
-        <p class="detail-paragraph" data-detail="2" data-i18n="stat_d3">远销东南亚、印度、迪拜等二十余个国家和地区</p>
-      </div>
-      <div class="stat-card">
-        <div class="stomp-wrapper">
-          <div class="stomp-stack stack-a"><h1 class="heading-style-h1">100%</h1></div>
-          <div class="stomp-stack stack-b"><h1 class="heading-style-h1" data-stat="3">100% 手工精修</h1></div>
-        </div>
-        <p class="detail-paragraph" data-detail="3" data-i18n="stat_d4">出厂全检，品质承诺，售后无忧</p>
-        <p class="card-subtext" data-i18n="stat_sub">兴芝林刀剪厂，始于 2013 年。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= NEWS ================= -->
-  <section class="news-section" id="news">
-    <h2 class="news-heading" data-fade-slide-in data-i18n="news_heading">新闻动态</h2>
-    <div class="news-list">
-      <a class="news-item" href="#news" data-fade-slide-in>
-        <span class="news-date">2026.09.18</span>
-        <span class="news-title" data-i18n="news1_title">亮相广交会，厨房剪系列备受海外客商青睐</span>
-        <span class="news-arrow">→</span>
-        <span class="news-excerpt" data-i18n="news1_excerpt">第 140 届广交会上，兴芝林多款厨房剪刀吸引了来自东南亚、中东的数十家采购商驻足洽谈，现场达成多项合作意向。</span>
-      </a>
-      <a class="news-item" href="#news" data-fade-slide-in>
-        <span class="news-date">2026.07.02</span>
-        <span class="news-title" data-i18n="news2_title">新品「鸡骨剪」上市，斩骨如泥好评如潮</span>
-        <span class="news-arrow">→</span>
-        <span class="news-excerpt" data-i18n="news2_excerpt">加厚锯齿刃口、省力弹簧设计，全新鸡骨剪一经推出便受到餐饮客户与家庭用户的一致好评。</span>
-      </a>
-      <a class="news-item" href="#news" data-fade-slide-in>
-        <span class="news-date">2026.04.11</span>
-        <span class="news-title" data-i18n="news3_title">牵手迪拜经销商，深耕中东市场</span>
-        <span class="news-arrow">→</span>
-        <span class="news-excerpt" data-i18n="news3_excerpt">兴芝林与迪拜头部厨具经销商签署战略合作协议，未来三年将共同开拓中东及北非市场。</span>
-      </a>
-    </div>
-  </section>
-
-  <div class="footer-spacer" id="footerSpacer"></div>
-</main>
-
-<!-- ================= FOOTER (fixed reveal) ================= -->
-<footer class="site-footer" id="siteFooter">
-  <div class="footer-col">
-    <a class="footer-link-head" href="#contact" data-i18n="footer_signin">经销商登录</a>
-    <div class="footer-credits">
-      <span data-i18n="footer_c1">小批量匠心制造</span><br />
-      <span data-i18n="footer_c2">兴芝林刀剪厂</span>
-      <div class="blank-line"></div>
-      <span data-i18n="footer_c3">位于中国阳江</span><br />
-      <span data-i18n="footer_c4">(c) 兴芝林 2026</span><br />
-      <span data-i18n="footer_c5">所有产品均为原创设计。</span>
-    </div>
-    <div class="footer-contact" id="contact">
-      <strong data-i18n="contact_addr_label">地址：</strong><span data-i18n="contact_addr">广东省阳江市阳东区红丰镇兴芝林刀剪厂</span><br />
-      <strong data-i18n="contact_tel_label">电话：</strong><a href="tel:16666847888">16666847888</a>
     </div>
   </div>
-  <div class="footer-col">
-    <a class="footer-link-head" href="#contact" data-i18n="footer_follow">关注我们</a>
-    <div class="footer-links">
-      <a href="#" data-i18n="footer_l1">退款政策</a>
-      <a href="#" data-i18n="footer_l2">隐私政策</a>
-      <a href="#" data-i18n="footer_l3">服务条款</a>
+</section>
+
+<section class="section" id="news">
+  <div class="section-kicker" data-zh="新闻动态" data-en="NEWS">新闻动态</div>
+  <h2 class="section-title reveal" data-zh="最新资讯" data-en="Latest">最新资讯</h2>
+  <div class="news-grid" id="newsGrid"></div>
+</section>
+
+<section class="section" id="contact">
+  <div class="section-kicker" data-zh="联系我们" data-en="CONTACT">联系我们</div>
+  <h2 class="section-title reveal" data-zh="期待与您合作" data-en="Let's Talk">期待与您合作</h2>
+  <p class="section-desc reveal" data-zh="无论是批发采购还是定制需求，欢迎随时联系我们。" data-en="For wholesale or custom orders, feel free to reach out.">无论是批发采购还是定制需求，欢迎随时联系我们。</p>
+  <div class="contact-grid">
+    <div class="contact-item reveal">
+      <div class="label" data-zh="地址" data-en="ADDRESS">地址</div>
+      <div class="value" data-zh="广东省阳江市阳东区红丰镇兴芝林刀剪厂" data-en="Xingzhilin Knife & Scissors Factory, Hongfeng Town, Yangdong District, Yangjiang, Guangdong">广东省阳江市阳东区红丰镇兴芝林刀剪厂</div>
+    </div>
+    <div class="contact-item reveal">
+      <div class="label" data-zh="电话" data-en="PHONE">电话</div>
+      <div class="value">16666847888</div>
     </div>
   </div>
-  <div class="footer-col">
-    <h3 data-i18n="footer_nl">订阅资讯</h3>
-    <p class="newsletter-desc" data-i18n="footer_nl_desc">加入我们的邮件列表，第一时间获取新品动态，首单享 9 折。</p>
-    <form class="newsletter-form" id="newsletterForm">
-      <input type="email" id="newsletterEmail" data-i18n-ph="footer_nl_ph" placeholder="邮箱地址" required />
-      <button class="btn-capsule" type="submit">
-        <span data-i18n="footer_nl_btn">订阅</span><span class="btn-circle"></span>
-      </button>
-    </form>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">XINGZHILIN</div>
+      <div class="footer-note" data-zh="兴芝林刀剪 · 精工利刃" data-en="Xingzhilin Scissors · Crafted Edge">兴芝林刀剪 · 精工利刃</div>
+    </div>
+    <div class="footer-copy">© 2026 兴芝林. All rights reserved.</div>
   </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
-/* ================================================================
-   XINGZHILIN · 兴芝林 — single-page app logic
-   GSAP 3.12.5 + ScrollTrigger · scroll-driven video scrubbing
-   ================================================================ */
+// ---------- data ----------
+const PRODUCTS = [
+  { img: '/images/xingzhilin-images/product-1.webp', zh: '曜石烤肉剪', en: 'Obsidian BBQ Shears', price: '¥168' },
+  { img: '/images/xingzhilin-images/product-2.webp', zh: '臻黑烤肉剪', en: 'Onyx BBQ Shears', price: '¥158' },
+  { img: '/images/xingzhilin-images/product-3.webp', zh: '磁吸冰箱剪', en: 'Magnetic Fridge Scissors', price: '¥98' },
+  { img: '/images/xingzhilin-images/product-4.webp', zh: '青竹家用剪', en: 'Bamboo Green Household Shears', price: '¥88' },
+  { img: '/images/xingzhilin-images/product-5.webp', zh: '墨灰磁吸剪', en: 'Graphite Magnetic Scissors', price: '¥108' },
+];
+const NEWS = [
+  { img: '/images/xingzhilin-images/forge-craftsman.jpg', date: '2026-09-28', zhT: '新品烤肉剪系列上市', zhD: '全新烤肉剪系列正式发布，手工研磨刃口，备受海外客户好评。', enT: 'New BBQ Shears Launched', enD: 'Our new BBQ shears series is here — hand-ground edges, loved by overseas clients.' },
+  { img: '/images/xingzhilin-images/forge-craftsman.jpg', date: '2026-08-15', zhT: '迪拜展会圆满结束', zhD: '兴芝林亮相迪拜国际五金展，与多家海外经销商达成合作意向。', enT: 'Dubai Expo Success', enD: 'XINGZHILIN showcased at Dubai Hardware Expo, partnering with new distributors.' },
+  { img: '/images/xingzhilin-images/forge-craftsman.jpg', date: '2026-06-20', zhT: '工厂扩建投产', zhD: '新厂房正式投产，产能提升40%，交货周期大幅缩短。', enT: 'Factory Expansion', enD: 'New facility online — capacity up 40%, lead times shortened.' },
+];
+
+// ---------- render products & news ----------
+let lang = 'zh';
+function renderProducts() {
+  document.getElementById('productTrack').innerHTML = PRODUCTS.map(p => `
+    <div class="product-card reveal">
+      <div class="img-wrap"><img src="${p.img}" alt="${p.zh}" loading="lazy"></div>
+      <div class="info">
+        <div class="name-zh">${lang === 'zh' ? p.zh : p.en}</div>
+        <div class="name-en">${lang === 'zh' ? p.en : p.zh}</div>
+        <div class="price">${p.price}</div>
+      </div>
+    </div>`).join('');
+}
+function renderNews() {
+  document.getElementById('newsGrid').innerHTML = NEWS.map(n => `
+    <a class="news-card reveal" href="javascript:void(0)">
+      <div class="thumb"><img src="${n.img}" alt="" loading="lazy"></div>
+      <div class="date">${n.date}</div>
+      <h3>${lang === 'zh' ? n.zhT : n.enT}</h3>
+      <p>${lang === 'zh' ? n.zhD : n.enD}</p>
+    </a>`).join('');
+}
+
+// ---------- hero title char split ----------
+function splitTitle() {
+  const el = document.getElementById('heroTitle');
+  const text = lang === 'zh' ? '精工利刃' : 'CRAFTED EDGE';
+  el.innerHTML = [...text].map(c => `<span class="char">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+}
+
+// ---------- language ----------
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('[data-zh]').forEach(el => {
+    el.textContent = l === 'zh' ? el.dataset.zh : el.dataset.en;
+  });
+  document.getElementById('langBtn').textContent = l === 'zh' ? 'EN' : '中文';
+  document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+  splitTitle(); renderProducts(); renderNews();
+  initAnims();
+}
+document.getElementById('langBtn').addEventListener('click', () => setLang(lang === 'zh' ? 'en' : 'zh'));
+
+// ---------- animations ----------
 gsap.registerPlugin(ScrollTrigger);
-
-/* ---------------- I18N ---------------- */
-const I18N = {
-  zh: {
-    nav_about: '关于我们', nav_bag: '[ 购物袋 ]',
-    menu_close: '关闭 ×', menu_products: '产品系列', menu_about: '关于兴芝林', menu_news: '新闻动态', menu_contact: '联系我们',
-    hero_t1: '精工', hero_t2: '利刃', hero_discover: '探索', hero_scroll: '向下滚动',
-    anno1: '手工研磨刃口', anno2: '兴芝林设计手稿',
-    forge_kicker: '匠心', forge_title: '千锤百炼', forge_sub: '烈火淬炼，方成利刃',
-    drag_hint: '拖拽旋转 · 滚动组装',
-    p1_name: '曜石烤肉剪', p2_name: '臻黑烤肉剪', p3_name: '磁吸冰箱剪',
-    p4_name: '青竹家用剪', p5_name: '墨灰磁吸剪',
-    reveal_caption: '一剪一世界，锋利即态度。',
-    stats_heading: '匠心之作，不妥协',
-    stats_p1: '每一把剪刀都由一双手完成——没有冰冷的流水线，没有敷衍的组装。先选材，再成型，顺应钢材的本性。',
-    stats_p2: '我们选用优质不锈钢，刀刃手工开锋、反复研磨。重量趁手，刃口锋利，每一处细节都不将就。',
-    stats_p3: '兴芝林为懂剪刀的人而存在。不止是工具，更是信赖。一把一剪，经久耐用。',
-    stats_cta: '查看产品',
-    stat_h0: '13年', stat_h1: '50+ 工匠', stat_h2: '20+ 市场', stat_h3: '100% 手工精修',
-    stat_d0: '十三年专注刀剪制造', stat_d1: '五十余名熟练工匠，每一把剪刀都经过手工精磨',
-    stat_d2: '远销东南亚、印度、迪拜等二十余个国家和地区', stat_d3: '出厂全检，品质承诺，售后无忧',
-    stat_sub: '兴芝林刀剪厂，始于 2013 年。',
-    news_heading: '新闻动态',
-    news1_title: '亮相广交会，厨房剪系列备受海外客商青睐',
-    news1_excerpt: '第 140 届广交会上，兴芝林多款厨房剪刀吸引了来自东南亚、中东的数十家采购商驻足洽谈，现场达成多项合作意向。',
-    news2_title: '新品「鸡骨剪」上市，斩骨如泥好评如潮',
-    news2_excerpt: '加厚锯齿刃口、省力弹簧设计，全新鸡骨剪一经推出便受到餐饮客户与家庭用户的一致好评。',
-    news3_title: '牵手迪拜经销商，深耕中东市场',
-    news3_excerpt: '兴芝林与迪拜头部厨具经销商签署战略合作协议，未来三年将共同开拓中东及北非市场。',
-    footer_signin: '经销商登录', footer_c1: '小批量匠心制造', footer_c2: '兴芝林刀剪厂',
-    footer_c3: '位于中国阳江', footer_c4: '(c) 兴芝林 2026', footer_c5: '所有产品均为原创设计。',
-    contact_addr_label: '地址：', contact_addr: '广东省阳江市阳东区红丰镇兴芝林刀剪厂',
-    contact_tel_label: '电话：',
-    footer_follow: '关注我们', footer_l1: '退款政策', footer_l2: '隐私政策', footer_l3: '服务条款',
-    footer_nl: '订阅资讯', footer_nl_desc: '加入我们的邮件列表，第一时间获取新品动态，首单享 9 折。',
-    footer_nl_ph: '邮箱地址', footer_nl_btn: '订阅',
-    toast_bag: '购物袋功能即将上线，敬请期待。', alert_newsletter: '订阅成功，欢迎加入！'
-  },
-  en: {
-    nav_about: 'ABOUT', nav_bag: '[ BAG ]',
-    menu_close: 'CLOSE ×', menu_products: 'Collection', menu_about: 'About XINGZHILIN', menu_news: 'News', menu_contact: 'Contact',
-    hero_t1: 'FORGED', hero_t2: 'PRECISION', hero_discover: 'DISCOVER', hero_scroll: 'Scroll',
-    anno1: 'Hand-ground edge', anno2: 'XINGZHILIN blueprint',
-    forge_kicker: 'CRAFTSMANSHIP', forge_title: 'Forged by Hand', forge_sub: 'From fire, into edge',
-    drag_hint: 'Drag to rotate · Scroll to assemble',
-    p1_name: 'Obsidian BBQ Shears', p2_name: 'Onyx BBQ Shears', p3_name: 'Magnetic Fridge Scissors',
-    p4_name: 'Bamboo Green Household Shears', p5_name: 'Graphite Magnetic Scissors',
-    reveal_caption: 'One cut, one world — sharpness as attitude.',
-    stats_heading: 'Made Without Compromise',
-    stats_p1: 'Each pair of shears is finished by a single pair of hands — no cold production line, no perfunctory assembly. Material first, form follows its nature.',
-    stats_p2: 'We choose fine stainless steel; every edge is hand-ground and honed, again and again. Balanced weight, razor edge — no detail compromised.',
-    stats_p3: 'XINGZHILIN exists for those who know shears. Not just a tool — a promise. One piece at a time, made to last.',
-    stats_cta: 'VIEW COLLECTION',
-    stat_h0: '13 Years', stat_h1: '50+ Artisans', stat_h2: '20+ Markets', stat_h3: '100% Hand-Finished',
-    stat_d0: 'Thirteen years devoted to blades and shears',
-    stat_d1: 'Over fifty skilled artisans; every pair hand-finished',
-    stat_d2: 'Exported to 20+ countries across Southeast Asia, India, Dubai and beyond',
-    stat_d3: 'Fully inspected before shipping, guaranteed for life',
-    stat_sub: 'Est. XINGZHILIN Shears Factory, 2013.',
-    news_heading: 'News',
-    news1_title: 'Canton Fair debut: kitchen shears win over overseas buyers',
-    news1_excerpt: 'At the 140th Canton Fair, XINGZHILIN shears drew dozens of buyers from Southeast Asia and the Middle East, closing multiple deals on the spot.',
-    news2_title: 'New poultry shears launched to rave reviews',
-    news2_excerpt: 'Thick serrated blades and an effortless spring design — our new poultry shears won over restaurants and home cooks alike.',
-    news3_title: 'Dubai partnership to grow Middle East presence',
-    news3_excerpt: 'XINGZHILIN signed a strategic agreement with a leading Dubai kitchenware distributor to expand across the Middle East and North Africa.',
-    footer_signin: 'Distributor Sign In', footer_c1: 'Handcrafted in small batches', footer_c2: 'XINGZHILIN Shears Factory',
-    footer_c3: 'Based in Yangjiang, China', footer_c4: '(c) XINGZHILIN 2026', footer_c5: 'All pieces are original designs.',
-    contact_addr_label: 'Address: ', contact_addr: 'Xingzhilin Scissors Factory, Hongfeng Town, Yangdong District, Yangjiang, Guangdong, China',
-    contact_tel_label: 'Tel: ',
-    footer_follow: 'Follow Us', footer_l1: 'Refund Policy', footer_l2: 'Privacy Policy', footer_l3: 'Terms of Service',
-    footer_nl: 'Newsletter', footer_nl_desc: 'Join our list. Be first to know new drops. 10% off your first order.',
-    footer_nl_ph: 'Email', footer_nl_btn: 'SUBSCRIBE',
-    toast_bag: 'Shopping bag coming soon.', alert_newsletter: "You're on the list. Welcome."
-  }
-};
-let LANG = 'zh';
-
-function applyI18n() {
-  const dict = I18N[LANG];
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.getAttribute('data-i18n');
-    if (dict[k] !== undefined) el.textContent = dict[k];
+function initAnims() {
+  ScrollTrigger.getAll().forEach(t => t.kill());
+  // hero title chars
+  gsap.to('.hero-title .char', { opacity: 1, y: 0, filter: 'blur(0px)', duration: .9, stagger: .08, ease: 'power3.out', delay: .3 });
+  // hero bg parallax
+  gsap.to('#heroBg', { yPercent: 14, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  // hero content fade on scroll
+  gsap.to('.hero-content', { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: '#hero', start: '40% top', end: 'bottom top', scrub: true } });
+  // reveals
+  document.querySelectorAll('.reveal').forEach(el => {
+    gsap.to(el, { opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-    const k = el.getAttribute('data-i18n-ph');
-    if (dict[k] !== undefined) el.setAttribute('placeholder', dict[k]);
-  });
-  // hero title lines
-  document.querySelectorAll('[data-title-line]').forEach(el => {
-    const idx = el.getAttribute('data-title-line');
-    el.textContent = dict[idx === '0' ? 'hero_t1' : 'hero_t2'];
-  });
-  // stat headings + details
-  document.querySelectorAll('[data-stat]').forEach(el => {
-    el.textContent = dict['stat_h' + el.getAttribute('data-stat')];
-  });
-  document.querySelectorAll('[data-detail]').forEach(el => {
-    const k = el.getAttribute('data-i18n');
-    if (dict[k] !== undefined) el.textContent = dict[k];
-  });
-  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
-  document.querySelectorAll('.lang-opt').forEach(o =>
-    o.classList.toggle('active', o.dataset.lang === LANG));
+  // nav style on scroll
+  ScrollTrigger.create({ start: 60, onUpdate: s => {
+    document.getElementById('nav').classList.toggle('scrolled', s.scroll() > 60);
+  }});
 }
 
-/* ---------------- TEXT SPLITTING ---------------- */
-function splitChars(el, cls) {
-  const text = el.textContent;
-  el.innerHTML = '';
-  [...text].forEach(ch => {
-    const s = document.createElement('span');
-    s.className = cls;
-    s.textContent = ch === ' ' ? '\u00A0' : ch;
-    el.appendChild(s);
-  });
-}
-function splitWords(el, cls) {
-  const words = el.textContent.trim().split(/\s+/);
-  el.innerHTML = '';
-  words.forEach((w, i) => {
-    const s = document.createElement('span');
-    s.className = cls;
-    s.textContent = w;
-    el.appendChild(s);
-    if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
-  });
-}
-function splitAll() {
-  document.querySelectorAll('.hero-title-line-inner').forEach(el => splitChars(el, 'hero-char'));
-  document.querySelectorAll('.heading-style-h1[data-stat]').forEach(el => splitChars(el, 'stat-char'));
-  document.querySelectorAll('.detail-paragraph').forEach(el => splitWords(el, 'detail-word'));
-}
-
-/* ---------------- FORGE 3D HERO ----------------
-   Phase 0.00-0.12: exploded parts, slow orbit
-   Phase 0.12-0.52: scroll assembles parts (staggered)
-   Phase 0.52-0.76: showcase — drag to rotate, annotations in
-   Phase 0.76-1.00: crossfade to craftsman forge finale */
-const heroSticky = document.getElementById('heroSticky');
-const forgeCanvas = document.getElementById('forge3dCanvas');
-const dustCanvas = document.getElementById('dustCanvas');
-const emberCanvas = document.getElementById('emberCanvas');
-const forgeFinale = document.getElementById('forgeFinale');
-const forgeImg = document.getElementById('forgeImg');
-const phaseHint = document.getElementById('phaseHint');
-const dctx = dustCanvas.getContext('2d');
-const ectx = emberCanvas.getContext('2d');
-let dustW = 0, dustH = 0;
-
-function sizeForge() {
-  const r = heroSticky.getBoundingClientRect();
-  dustW = dustCanvas.width = Math.max(1, Math.floor(r.width));
-  dustH = dustCanvas.height = Math.max(1, Math.floor(r.height));
-  emberCanvas.width = dustW; emberCanvas.height = dustH;
-  if (forgeRenderer) {
-    forgeRenderer.setSize(Math.floor(r.width), Math.floor(r.height), false);
-    forgeCamera.aspect = r.width / Math.max(1, r.height);
-    forgeCamera.updateProjectionMatrix();
-    fitShears();
-  }
-}
-function fitShears() {
-  if (!shears) return;
-  const a = forgeCamera.aspect || 1.6;
-  shears.scale.setScalar(0.78 * Math.max(0.55, Math.min(1, a / 1.5)));
-}
-
-// --- math helpers ---
-const clamp01 = v => Math.min(1, Math.max(0, v));
-const lerp = (a, b, t) => a + (b - a) * t;
-const sstep = (e0, e1, x) => { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
-const easeIO = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-// --- three.js scene ---
-let forgeRenderer = null, forgeCamera = null, shears = null;
-const partList = [];
-let webglOK = false;
-
-function bladeShape() {
-  const s = new THREE.Shape();
-  s.moveTo(20, 13);
-  s.quadraticCurveTo(-60, 24, -140, 27);
-  s.quadraticCurveTo(-182, 27, -196, 18);
-  s.quadraticCurveTo(-120, 4, -50, -3);
-  s.quadraticCurveTo(-12, -7, 18, -11);
-  s.closePath();
-  return s;
-}
-function gripShape() {
-  const s = new THREE.Shape();
-  s.moveTo(-10, 22);
-  s.quadraticCurveTo(55, 36, 118, 32);
-  s.quadraticCurveTo(170, 28, 174, 2);
-  s.quadraticCurveTo(170, -24, 118, -30);
-  s.quadraticCurveTo(55, -34, -10, -20);
-  s.closePath();
-  const hole = new THREE.Path();
-  hole.absellipse(92, 0, 46, 20, 0, Math.PI * 2, true);
-  s.holes.push(hole);
-  return s;
-}
-function extrudePart(shape, depth, mat, bevel, edgeMat) {
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel,
-    bevelSegments: 2, curveSegments: 28
-  });
-  geo.center();
-  const g = new THREE.Group();
-  g.add(new THREE.Mesh(geo, mat));
-  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 26), edgeMat));
-  return g;
-}
-function buildScrew(edgeMat) {
-  const g = new THREE.Group();
-  const sm = new THREE.MeshStandardMaterial({ color: 0x3a404c, metalness: 0.95, roughness: 0.28, side: THREE.DoubleSide });
-  const shaft = new THREE.CylinderGeometry(11, 11, 30, 24); shaft.rotateX(Math.PI / 2);
-  const cap = new THREE.CylinderGeometry(16.5, 16.5, 7, 28); cap.rotateX(Math.PI / 2); cap.translate(0, 0, 17);
-  const m1 = new THREE.Mesh(shaft, sm), m2 = new THREE.Mesh(cap, sm);
-  [m1, m2].forEach(m => m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 26), edgeMat)));
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(16.5, 1.7, 10, 40),
-    new THREE.MeshStandardMaterial({ color: 0xa3111e, metalness: 0.6, roughness: 0.4, emissive: 0x4a0000 })
-  );
-  ring.position.z = 17;
-  g.add(m1, m2, ring);
-  return g;
-}
-function buildSpring(edgeMat) {
-  const g = new THREE.Group();
-  const geo = new THREE.TorusGeometry(20, 5, 12, 32, 4.6);
-  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x8a8f9c, metalness: 0.9, roughness: 0.3, side: THREE.DoubleSide }));
-  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 26), edgeMat));
-  g.add(m);
-  return g;
-}
-
-function initForge3D() {
-  forgeRenderer = new THREE.WebGLRenderer({ canvas: forgeCanvas, alpha: true, antialias: true });
-  forgeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  const scene = new THREE.Scene();
-  forgeCamera = new THREE.PerspectiveCamera(34, 1, 1, 4000);
-  forgeCamera.position.set(0, 0, 640);
-  forgeCamera.lookAt(0, 0, 0);
-
-  // raking light reveals the relief depth like a metal nameplate
-  scene.add(new THREE.HemisphereLight(0x8a93a8, 0x04060b, 0.5));
-  const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(280, 220, 380); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xc22030, 0.6); rim.position.set(-260, -40, -280); scene.add(rim);
-  const fill = new THREE.DirectionalLight(0x4a5a78, 0.35); fill.position.set(-160, 160, 300); scene.add(fill);
-
-  shears = new THREE.Group(); // the relief plaque group
-  scene.add(shears);
-  initForge3D.scene = scene;
-
-  // --- blueprint relief: the manuscript as a 3D nameplate, 6 fragments ---
-  const bpTex = new THREE.TextureLoader().load('/images/blueprint.webp');
-  bpTex.anisotropy = 4;
-  const COLS = 3, ROWS = 2;
-  const PW = 400, PH = 129; // 1800x580 aspect (~3.1:1), ~60% of viewport width
-  const TW = PW / COLS, TH = PH / ROWS;
-  const fragOrder = [3, 0, 4, 1, 5, 2]; // staggered fly-in sequence
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const geo = new THREE.PlaneGeometry(TW, TH, 44, 20);
-      const uv = geo.attributes.uv;
-      for (let i = 0; i < uv.count; i++) {
-        uv.setXY(i, (c + uv.getX(i)) / COLS, 1 - (r + 1 - uv.getY(i)) / ROWS);
-      }
-      const mat = new THREE.MeshStandardMaterial({
-        map: bpTex, displacementMap: bpTex,
-        displacementScale: 15, displacementBias: -5,
-        metalness: 0.62, roughness: 0.42,
-        side: THREE.DoubleSide
-      });
-      const tile = new THREE.Group();
-      tile.add(new THREE.Mesh(geo, mat));
-      // thin dark backing so fragments read as solid shards
-      const back = new THREE.Mesh(
-        new THREE.BoxGeometry(TW - 1.5, TH - 1.5, 7),
-        new THREE.MeshStandardMaterial({ color: 0x0c0e13, metalness: 0.7, roughness: 0.5 })
-      );
-      back.position.z = -4.5;
-      tile.add(back);
-      const ax = (c - 1) * TW, ay = (0.5 - r) * TH;
-      const idx = r * COLS + c;
-      const seq = fragOrder.indexOf(idx);
-      // scattered start: flung outward in 3D
-      const ang = (idx / 6) * Math.PI * 2 + 0.4;
-      const ex = Math.cos(ang) * (300 + seq * 45);
-      const ey = Math.sin(ang) * (190 + seq * 30) + (r === 0 ? 60 : -60);
-      const ez = 170 + seq * 68;
-      tile.userData = { ax, ay, az: 0, ex, ey, ez, seq,
-        erx: (seq - 2.5) * 0.55, ery: (seq - 2.5) * 0.7, erz: (seq - 2.5) * 0.22 };
-      tile.position.set(ex, ey, ez);
-      tile.rotation.set(tile.userData.erx, tile.userData.ery, tile.userData.erz);
-      shears.add(tile);
-      partList.push(tile);
-    }
-  }
-
-  // --- forging hammer: descends from above, gently touches the plaque ---
-  const hammer = new THREE.Group();
-  const steelM = new THREE.MeshStandardMaterial({ color: 0x3a3f47, metalness: 0.9, roughness: 0.32 });
-  const woodM = new THREE.MeshStandardMaterial({ color: 0x2a1d12, metalness: 0.1, roughness: 0.7 });
-  const head = new THREE.Mesh(new THREE.BoxGeometry(64, 44, 44), steelM);
-  const faceA = new THREE.Mesh(new THREE.CylinderGeometry(23, 23, 10, 24), steelM);
-  faceA.rotation.z = Math.PI / 2; faceA.position.x = 37;
-  const faceB = faceA.clone(); faceB.position.x = -37;
-  const handle = new THREE.Mesh(new THREE.CylinderGeometry(7, 9, 210, 16), woodM);
-  handle.position.y = 125;
-  const collar = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 14, 16), steelM);
-  collar.position.y = 28;
-  hammer.add(head, faceA, faceB, handle, collar);
-  hammer.rotation.z = 0.10; // slight natural tilt
-  hammer.position.set(30, 520, 60); // starts above the frame
-  hammer.visible = false;
-  scene.add(hammer);
-  initForge3D.hammer = hammer;
-
-  fitShears();
-}
-try { initForge3D(); webglOK = true; } catch (err) { webglOK = false; }
-
-// --- drag to rotate ---
-let dragging = false, lastPX = 0, lastPY = 0;
-let userRotY = 0, userRotX = 0;
-forgeCanvas.addEventListener('pointerdown', e => {
-  dragging = true; lastPX = e.clientX; lastPY = e.clientY;
-  forgeCanvas.style.cursor = 'grabbing';
-  try { forgeCanvas.setPointerCapture(e.pointerId); } catch (_) {}
-});
-forgeCanvas.addEventListener('pointermove', e => {
-  if (!dragging) return;
-  userRotY += (e.clientX - lastPX) * 0.006;
-  userRotX = Math.max(-0.55, Math.min(0.55, userRotX + (e.clientY - lastPY) * 0.004));
-  lastPX = e.clientX; lastPY = e.clientY;
-});
-const endDrag = () => { dragging = false; forgeCanvas.style.cursor = 'grab'; };
-forgeCanvas.addEventListener('pointerup', endDrag);
-forgeCanvas.addEventListener('pointercancel', endDrag);
-
-// --- ambient dust (subtle) ---
-const dustParts = [];
-for (let i = 0; i < 55; i++) dustParts.push({
-  x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.8,
-  s: 0.0002 + Math.random() * 0.0006, a: 0.04 + Math.random() * 0.10,
-  cr: Math.random() < 0.12, ph: Math.random() * 6.28
-});
-function drawDust(t) {
-  dctx.clearRect(0, 0, dustW, dustH);
-  for (const p of dustParts) {
-    p.y -= p.s; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
-    const tw = 0.7 + 0.3 * Math.sin(t * 0.001 + p.ph);
-    dctx.beginPath();
-    dctx.arc(p.x * dustW, p.y * dustH, p.r, 0, 6.283);
-    dctx.fillStyle = p.cr
-      ? 'rgba(163,17,30,' + (p.a * tw).toFixed(3) + ')'
-      : 'rgba(255,255,255,' + (p.a * 0.8 * tw).toFixed(3) + ')';
-    dctx.fill();
-  }
-}
-
-// --- forge embers ---
-const embers = [];
-for (let i = 0; i < 70; i++) embers.push({
-  x: 0.15 + Math.random() * 0.7, y: Math.random(),
-  r: 0.8 + Math.random() * 2.2, vy: 0.0012 + Math.random() * 0.003,
-  sway: Math.random() * 6.28, life: 0.6 + Math.random() * 0.4,
-  hot: Math.random() < 0.4
-});
-function drawEmbers(t, fp) {
-  ectx.clearRect(0, 0, dustW, dustH);
-  if (fp <= 0.01) return;
-  for (const p of embers) {
-    p.y -= p.vy; p.sway += 0.02;
-    if (p.y < -0.03) { p.y = 1.05; p.x = 0.15 + Math.random() * 0.7; }
-    const fl = 0.6 + 0.4 * Math.sin(t * 0.02 + p.sway * 3);
-    const alpha = (fp * p.life * fl).toFixed(3);
-    ectx.beginPath();
-    ectx.arc(p.x * dustW + Math.sin(p.sway) * 22, p.y * dustH, p.r, 0, 6.283);
-    ectx.fillStyle = p.hot ? 'rgba(255,120,40,' + alpha + ')' : 'rgba(200,50,30,' + alpha + ')';
-    ectx.fill();
-  }
-}
-
-// --- per-frame 3D update ---
-let forgeT = 0, autoRotY = 0;
-function updateForge3D(hp, dt) {
-  if (!webglOK) return;
-  forgeT += dt;
-  // fragments fly in and assemble, staggered by seq
-  const asmP = sstep(0.10, 0.48, hp);
-  partList.forEach(g => {
-    const d = g.userData;
-    const local = clamp01((asmP - d.seq * 0.09) / (1 - 5 * 0.09));
-    const e = easeIO(local);
-    g.position.set(lerp(d.ex, d.ax, e), lerp(d.ey, d.ay, e), lerp(d.ez, d.az, e));
-    g.rotation.set(lerp(d.erx, 0, e), lerp(d.ery, 0, e), lerp(d.erz, 0, e));
-  });
-  // showcase: gentle auto-rotation + user drag
-  const showcase = sstep(0.46, 0.56, hp) * (1 - sstep(0.66, 0.74, hp));
-  autoRotY += dt * (0.30 * (1 - asmP) + 0.12) * (0.25 + 0.75 * showcase + 0.25 * (1 - showcase));
-  shears.rotation.y = autoRotY + userRotY;
-  shears.rotation.x = userRotX + Math.sin(forgeT * 0.6) * 0.03;
-  shears.position.y = Math.sin(forgeT * 0.9) * 6;
-  // hammer: slowly descends from above, gently touches the plaque
-  const hammer = initForge3D.hammer;
-  if (hammer) {
-    const hp2 = sstep(0.62, 0.86, hp); // descent progress
-    hammer.visible = hp > 0.60 && hp < 0.94;
-    const hy = lerp(520, 74, easeIO(hp2)); // 74 = head lightly touches plaque top
-    hammer.position.y = hy + Math.sin(forgeT * 1.1) * 2.5 * (1 - hp2);
-    hammer.position.x = lerp(60, 30, hp2);
-    hammer.rotation.z = lerp(0.22, 0.10, hp2);
-    // on touch: tiny settle bounce + fade out as craftsman fades in
-    const touch = sstep(0.86, 0.90, hp);
-    hammer.position.y = lerp(hammer.position.y, 68, touch);
-    hammer.visible = hp < 0.93;
-  }
-  forgeCamera.position.z = lerp(680, 610, asmP);
-  forgeCamera.position.y = lerp(30, 8, asmP);
-  forgeCamera.lookAt(0, 0, 0);
-  forgeRenderer.render(initForge3D.scene, forgeCamera);
-  // finale crossfade (after hammer touch)
-  const fp = sstep(0.865, 0.96, hp);
-  forgeFinale.style.opacity = fp.toFixed(3);
-  forgeCanvas.style.opacity = Math.max(0, 1 - fp * 1.35).toFixed(3);
-  forgeImg.style.transform = 'scale(' + (1.06 + fp * 0.14).toFixed(3) + ')';
-  // annotations during showcase (before hammer)
-  const annos = document.querySelectorAll('.anno');
-  annos.forEach((el, i) => el.classList.toggle('on', hp > 0.50 + i * 0.04 && hp < 0.70));
-  phaseHint.classList.toggle('on', hp > 0.48 && hp < 0.66);
-  return fp;
-}
-
-/* ---------------- VIDEO SCRUB CORE (reveal video) ----------------
-   The !video.seeking guard is essential: only update currentTime
-   when the decoder has finished the previous seek. */
-const revealVideo = document.getElementById('revealVideo');
-const scrub = { reveal: { target: 0, current: 0 } };
-if (revealVideo) {
-  revealVideo.pause();
-  revealVideo.addEventListener('error', () => {}, true);
-}
-
-function heroProgress() {
-  const hero = document.getElementById('hero');
-  const total = hero.offsetHeight - window.innerHeight;
-  if (total <= 0) return 0;
-  const p = -hero.getBoundingClientRect().top / total;
-  return Math.min(1, Math.max(0, p));
-}
-
-let carouselTL = null;
-
-function scrubTick() {
-  const now = performance.now();
-  const dt = Math.min(0.05, (now - (scrubTick._last || now)) / 1000);
-  scrubTick._last = now;
-  // --- forge 3D hero ---
-  const hp = heroProgress();
-  const fp = updateForge3D(hp, dt) || 0;
-  if (dustW > 0) drawDust(now);
-  drawEmbers(now, fp);
-  // --- hero text exit (progress > 80%) ---
-  const chars = document.querySelectorAll('.hero-char');
-  const discoverBtn = document.getElementById('discoverBtn');
-  const hint = document.querySelector('.hero-scroll-hint');
-  if (hp > 0.8 && chars.length) {
-    const ep = (hp - 0.8) / 0.2;
-    chars.forEach((ch, i) => {
-      const stagger = (i / chars.length) * 0.55;
-      const cp = Math.min(1, Math.max(0, (ep - stagger) / 0.45));
-      const e = cp * cp * cp; // cubic ease
-      ch.style.opacity = String(1 - e);
-      ch.style.filter = 'blur(' + (e * 8).toFixed(2) + 'px)';
-      ch.style.transform = 'translateY(' + (-e * 44).toFixed(1) + 'px)';
-    });
-    const bp = Math.pow(ep, 4);
-    if (discoverBtn) {
-      discoverBtn.style.opacity = String(1 - bp);
-      discoverBtn.style.transform = 'translateY(' + (-bp * 30).toFixed(1) + 'px)';
-    }
-    if (hint) hint.style.opacity = '0';
-  } else if (chars.length) {
-    chars.forEach(ch => { ch.style.opacity = '1'; ch.style.filter = 'blur(0px)'; ch.style.transform = 'translateY(0)'; });
-    if (discoverBtn) { discoverBtn.style.opacity = '1'; discoverBtn.style.transform = 'translateY(0)'; }
-    if (hint) hint.style.opacity = '';
-  }
-  // --- reveal video (driven by carousel timeline progress) ---
-  const wrapper = document.getElementById('videoScalingWrapper');
-  if (carouselTL && revealVideo.duration) {
-    const tp = carouselTL.progress();
-    const rp = Math.min(1, Math.max(0, (tp - 0.625) / 0.375)); // phase 2 window
-    scrub.reveal.target = rp * revealVideo.duration;
-    if (wrapper) wrapper.classList.toggle('active', rp > 0.03);
-  }
-  scrub.reveal.current += (scrub.reveal.target - scrub.reveal.current) * 0.08;
-  if (revealVideo.duration && !revealVideo.seeking &&
-      Math.abs(revealVideo.currentTime - scrub.reveal.current) > 0.01) {
-    try { revealVideo.currentTime = scrub.reveal.current; } catch (e) {}
-  }
-  requestAnimationFrame(scrubTick);
-}
-
-/* ---------------- SCROLL FX (rebuildable) ---------------- */
-function buildScrollFX() {
-  ScrollTrigger.getAll().forEach(st => st.kill());
-  if (carouselTL) { carouselTL.kill(); carouselTL = null; }
-  splitAll();
-
-  // --- Awards: pinned horizontal scroll + video reveal ---
-  const grid = document.getElementById('awardsGrid');
-  const getDist = () => Math.max(0, grid.scrollWidth - window.innerWidth);
-  gsap.set(grid, { x: 0 });
-  carouselTL = gsap.timeline({
-    scrollTrigger: {
-      trigger: '#products',
-      start: 'top top',
-      end: () => '+=' + (getDist() + window.innerHeight),
-      pin: true,
-      scrub: true,
-      anticipatePin: 1,
-      invalidateOnRefresh: true
-    }
-  });
-  carouselTL.to(grid, { x: () => -getDist(), ease: 'none', duration: 1 }, 0);
-  carouselTL.fromTo('#videoScalingWrapper', { width: '0%' }, {
-    width: '100%', ease: 'none', duration: 0.6
-  }, 1);
-
-  // --- Left column fade+slide ---
-  gsap.utils.toArray('[data-fade-slide-in]').forEach(el => {
-    gsap.fromTo(el, { autoAlpha: 0, y: 20 }, {
-      autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 88%' }
-    });
-  });
-
-  // --- Stat cards: char / word reveal ---
-  document.querySelectorAll('.stat-card').forEach(card => {
-    const chars = card.querySelectorAll('.stat-char');
-    const words = card.querySelectorAll('.detail-word');
-    if (chars.length) {
-      gsap.fromTo(chars, { opacity: 0.12, y: 12 }, {
-        opacity: 1, y: 0, stagger: 0.035, duration: 0.5, ease: 'power2.out',
-        scrollTrigger: { trigger: card, start: 'top 78%' }
-      });
-    }
-    if (words.length) {
-      gsap.fromTo(words, { opacity: 0.1 }, {
-        opacity: 1, stagger: 0.02, duration: 0.4, ease: 'power1.out',
-        scrollTrigger: { trigger: card, start: 'top 70%' }
-      });
-    }
-  });
-
-  sizeFooterSpacer();
-  ScrollTrigger.refresh();
-}
-
-function sizeFooterSpacer() {
-  const f = document.getElementById('siteFooter');
-  const s = document.getElementById('footerSpacer');
-  if (f && s) s.style.height = f.offsetHeight + 'px';
-}
-
-/* ---------------- INTERACTIONS ---------------- */
-document.getElementById('discoverBtn').addEventListener('click', () => {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-});
-document.getElementById('viewCollectionBtn').addEventListener('click', () => {
-  document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-});
-document.querySelector('.about-link').addEventListener('click', e => {
-  e.preventDefault();
-  document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-});
-
-// menu overlay
-const overlay = document.getElementById('menuOverlay');
-document.getElementById('menuBtn').addEventListener('click', () => overlay.classList.add('open'));
-document.getElementById('menuClose').addEventListener('click', () => overlay.classList.remove('open'));
-overlay.querySelectorAll('nav a').forEach(a =>
-  a.addEventListener('click', () => overlay.classList.remove('open')));
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') overlay.classList.remove('open');
-});
-
-// bag toast
-const toast = document.createElement('div');
-toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#000;color:#fff;font-size:14px;padding:12px 24px;border-radius:100px;z-index:300;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;';
-document.body.appendChild(toast);
-let toastTimer = null;
-document.getElementById('bagBtn').addEventListener('click', () => {
-  toast.textContent = I18N[LANG].toast_bag;
-  toast.style.opacity = '1';
-  toast.style.transform = 'translateX(-50%) translateY(0)';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(20px)';
-  }, 2200);
-});
-
-// newsletter
-document.getElementById('newsletterForm').addEventListener('submit', e => {
-  e.preventDefault();
-  alert(I18N[LANG].alert_newsletter);
-  document.getElementById('newsletterEmail').value = '';
-});
-
-// language toggle
-document.getElementById('langToggle').addEventListener('click', () => {
-  LANG = LANG === 'zh' ? 'en' : 'zh';
-  applyI18n();
-  buildScrollFX();
-});
-
-/* ---------------- RESIZE (debounced rebuild) ---------------- */
-let resizeTimer = null;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    sizeFooterSpacer();
-    sizeForge();
-    buildScrollFX();
-  }, 200);
-});
-
-/* ---------------- INIT (on fonts ready — don't wait for video) ---------------- */
-applyI18n();
-sizeForge();
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => {
-    buildScrollFX();
-    sizeForge();
-    requestAnimationFrame(scrubTick);
-  });
-} else {
-  window.addEventListener('DOMContentLoaded', () => {
-    buildScrollFX();
-    sizeForge();
-    requestAnimationFrame(scrubTick);
-  });
-}
-window.addEventListener('load', () => sizeFooterSpacer());
+// ---------- init ----------
+splitTitle(); renderProducts(); renderNews(); initAnims();
 </script>
 </body>
 </html>
